@@ -22,8 +22,9 @@ const scene9 = require('./viewOrder');
 
 
 //intialize app with bot token
-const URL=process.env.BOT_TOKEN ;
-const PORT=2000;
+const URL = process.env.URL; 
+const BOT_TOKEN = process.env.BOT_TOKEN ;
+const PORT = process.env.PORT || 5000;
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // Handler For /start command
@@ -229,4 +230,8 @@ bot.action("SUBSCRIBE_NOW", ctx => ctx.scene.enter("SubscriptionScene"))
 
 // bot.startWebhook(`/bot${BOT_TOKEN}`, null, 5000)
 
-bot.launch();
+// bot.launch();
+
+
+bot.telegram.setWebhook(`${URL}bot${BOT_TOKEN}`);
+bot.startWebhook(`/bot${BOT_TOKEN}`, null, PORT);
