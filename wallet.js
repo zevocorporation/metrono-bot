@@ -3,13 +3,84 @@ const Keyboard = require('telegraf-keyboard');
 const fetch = require('node-fetch');
 const request =require('request');
 const Markup = require('telegraf/markup');
+const uuid=require('uuid');
 
 
 
 
 const walletScene= new WizardScene(
     'WalletScene',
-    ctx=>{
+    async ctx=>{
+
+        let notRegistered=false;
+
+        const userExists = {
+          query: `
+              query
+              {
+                userexists(chatId:"${ctx.from.id}"){
+                  name
+                }
+              }
+              `
+        };
+      
+        //Send request to graphql api about current user
+      
+        await fetch("http://localhost:4000/graphql", {
+          method: "POST",
+          body: JSON.stringify(userExists),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+          .then(res => {
+            if (res.status !== 200 && res.status !== 201) {
+              throw new Error("Failed!");
+            }
+            return res.json();
+          })
+          .then(response => {
+            //If user is already in database . Show order Button
+            if (!response.data.userexists) {
+             notRegistered=true;
+            }
+      
+           
+          })
+          .catch(err => console.log(err));
+      
+    
+      if (notRegistered)
+      {
+        ctx.reply(
+          "Sorry you have to register first!",
+          Markup.inlineKeyboard([
+            Markup.callbackButton("Register", "REGISTER_NOW")
+          ]).extra()
+        );
+    
+        return ctx.scene.leave();
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
         const keyboard=new Keyboard();
         keyboard.add('Check balance','Recharge wallet').add("Home");
@@ -34,7 +105,7 @@ const walletScene= new WizardScene(
         if(ctx.message.text=="Home")
         {
             const keyboard = new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
             ctx.reply("Choose an option!",keyboard.draw());
 
             return ctx.scene.leave();
@@ -108,7 +179,7 @@ const walletScene= new WizardScene(
     if(ctx.message.text!="Silver Pack Rs.99 200credits" && ctx.message.text!="Gold Rs.299 1000credits" && ctx.message.text!="Zero Rs.499 2500credits" && ctx.message.text!="Home")
     {
             const keyboard=new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
             ctx.reply("Please Choose from given options!",keyboard.draw())
             return ctx.scene.leave();
     }
@@ -116,7 +187,7 @@ const walletScene= new WizardScene(
     if(ctx.message.text=="Home")
         {
             const keyboard = new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
             ctx.reply("Choose an option!",keyboard.draw());
 
             return ctx.scene.leave();
@@ -237,7 +308,9 @@ const walletScene= new WizardScene(
                 ctx.wizard.state.paymentId= temp.payment_request.id;
                 console.log(response.statusCode);
                 // ctx.reply(temp.payment_request.longurl)
-                ctx.reply(`Your amount is Rs.${amount}`,Markup.removeKeyboard().extra())
+                const keyboard= new Keyboard();
+                keyboard.add("/start");
+                ctx.reply(`Your amount is Rs.${amount}`,keyboard.draw())
                 ctx.reply(`Click below to Pay`, Markup.inlineKeyboard([
                     Markup.urlButton('Make Payment', `${temp.payment_request.longurl}`)
                 ]).extra());
@@ -286,7 +359,7 @@ const walletScene= new WizardScene(
     });
 
     await promise.then(res=>{
-        var interval =setInterval(function testOne()
+        var interval =setInterval( function testOne()
         {
             count=count+1;
 
@@ -306,7 +379,7 @@ const walletScene= new WizardScene(
 
                         {
 
-                            const updatePaymentStatus={
+                            const setCredits={
 
                                 query:
                                 `
@@ -322,11 +395,41 @@ const walletScene= new WizardScene(
                                
                                    
                                 }
-                            
+
+
+                                const updateWalletPaymentStatus={
+                                    query:`
+                                    mutation{
+                                        updateWalletPaymentStatus(paymentId:"${res}")
+                                        {
+                                          plan
+                                        }
+                                      }
+                                    
+                                    
+                                    `
+                                }
+                                
+                                 fetch('http://localhost:4000/graphql',{
+                                method:'POST',
+                                body:JSON.stringify(updateWalletPaymentStatus),
+                                headers:
+                                {
+                                    'Content-Type':'application/json'
+                                }
+                            }).then(res=>{
+                                if (res.status !== 200 && res.status !==201)
+                                {
+                                    throw new Error("Failed!");
+                                }
+                                return res.json();
+                            }).then(response=> {
+                                console.log(response);
+                            }).catch( err => console.log(err))
 
                             fetch('http://localhost:4000/graphql',{
                                 method:'POST',
-                                body:JSON.stringify(updatePaymentStatus),
+                                body:JSON.stringify(setCredits),
                                 headers:
                                 {
                                     'Content-Type':'application/json'
@@ -342,7 +445,7 @@ const walletScene= new WizardScene(
                             }).catch( err => console.log(err))
 
                             const keyboard=new Keyboard();
-                            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+                            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
                             ctx.reply("Recharge Successful!",keyboard.draw());
                             clearInterval(interval);
                         }

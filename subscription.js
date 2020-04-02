@@ -7,16 +7,68 @@ const Markup = require('telegraf/markup')
 
 const subscriptionScene= new WizardScene(
     'SubscriptionScene',
-    ctx=>
+   async ctx=>
     {
+
+        let notRegistered=false;
+
+    const userExists = {
+      query: `
+          query
+          {
+            userexists(chatId:"${ctx.from.id}"){
+              name
+            }
+          }
+          `
+    };
+  
+    //Send request to graphql api about current user
+  
+    await fetch("http://localhost:4000/graphql", {
+      method: "POST",
+      body: JSON.stringify(userExists),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error("Failed!");
+        }
+        return res.json();
+      })
+      .then(response => {
+        //If user is already in database . Show order Button
+        if (!response.data.userexists) {
+         notRegistered=true;
+        }
+  
+       
+      })
+      .catch(err => console.log(err));
+  
+
+  if (notRegistered)
+  {
+    ctx.reply(
+      "Sorry you have to register first!",
+      Markup.inlineKeyboard([
+        Markup.callbackButton("Register", "REGISTER_NOW")
+      ]).extra()
+    );
+
+    return ctx.scene.leave();
+  }
+
         const keyboard=new Keyboard;
-        keyboard.add("7 day plan -Rs.699").add("28 day plan-Rs.3000").add("Home");
+        keyboard.add("7 day plan").add("28 day plan").add("Home");
         ctx.reply("Choose from plans given below",keyboard.draw());
         return ctx.wizard.next();
     },
 
     ctx=>{
-        if(ctx.message.text!="7 day plan -Rs.699" && ctx.message.text!="28 day plan-Rs.3000"  && ctx.message.text!="Home" )
+        if(ctx.message.text!="7 day plan" && ctx.message.text!="28 day plan"  && ctx.message.text!="Home" )
         {
             const keyboard=new Keyboard;
             keyboard.add("Home");
@@ -28,26 +80,26 @@ const subscriptionScene= new WizardScene(
         if(ctx.message.text=="Home")
         {
             const keyboard = new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
             ctx.reply("Choose an option!",keyboard.draw());
 
             return ctx.scene.leave();
         }
-        if(ctx.message.text=="7 day plan -Rs.699")
+        if(ctx.message.text=="7 day plan")
         {
             ctx.wizard.state.plan="7 day plan";
-            ctx.wizard.state.amount=699;
+            // ctx.wizard.state.amount=699;
 
         }
-        else if(ctx.message.text=="28 day plan-Rs.3000")
+        else if(ctx.message.text=="28 day plan")
         {
             ctx.wizard.state.plan="28 day plan";
-            ctx.wizard.state.amount=3000;
+            // ctx.wizard.state.amount=3000;
         }
 
         const keyboard=new Keyboard;
-        keyboard.add("North Indian").add("South Indian").add("Home");
-        ctx.reply("Select a cuisine!",keyboard.draw());
+        keyboard.add("Regular").add("Medium").add("Jumbo").add("Home");
+        ctx.reply("Select your pack size!",keyboard.draw());
         return ctx.wizard.next();
         
 
@@ -56,12 +108,80 @@ const subscriptionScene= new WizardScene(
 
     },
 
-    async ctx=>{
+    ctx=>{
 
+        if(ctx.message.text!="Regular" && ctx.message.text!="Medium"  && ctx.message.text!="Jumbo" && ctx.message.text!="Home" )
+        {
+            const keyboard=new Keyboard;
+            keyboard.add("Home");
+             ctx.reply("Please Choose from given plans!",keyboard.draw());
+             return ctx.wizard.next();
+            
+        }
+
+        if(ctx.message.text=="Home")
+        {
+            const keyboard = new Keyboard();
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
+            ctx.reply("Choose an option!",keyboard.draw());
+
+            return ctx.scene.leave();
+        }
+
+        ctx.wizard.state.pack=ctx.message.text;
+
+        const keyboard=new Keyboard;
+        keyboard.add("North Indian").add("South Indian").add("Home");
+        ctx.reply("Select a cuisine!",keyboard.draw());
+        return ctx.wizard.next();
+
+    },
+
+
+
+    ctx=>
+    {
         if(ctx.message.text!="North Indian" && ctx.message.text!="South Indian"  && ctx.message.text!="Home" )
         {
             const keyboard=new Keyboard;
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
+             ctx.reply("Please Choose from given plans!",keyboard.draw());
+            return ctx.scene.leave();
+            
+        }
+        
+        if(ctx.message.text=="Home")
+        {
+            const keyboard = new Keyboard();
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
+            ctx.reply("Choose an option!",keyboard.draw());
+
+            return ctx.scene.leave();
+        }
+        if(ctx.message.text=="North Indian")
+        {
+            ctx.wizard.state.cuisine="North Indian"
+        }
+
+        if(ctx.message.text=="South Indian")
+        {
+            ctx.wizard.state.cuisine="South Indian"
+        }
+        const keyboard=new Keyboard;
+        keyboard.add("Pickup").add("Home Delivery").add("Home");
+        ctx.reply("Select your delivery type",keyboard.draw());
+        return ctx.wizard.next();
+
+    },
+
+    async ctx=>{
+
+        let delivery;
+
+        if(ctx.message.text!="Pickup" && ctx.message.text!="Home Delivery"  && ctx.message.text!="Home" )
+        {
+            const keyboard=new Keyboard;
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
              ctx.reply("Please Choose from given plans!",keyboard.draw());
             return ctx.scene.leave();
             
@@ -70,15 +190,27 @@ const subscriptionScene= new WizardScene(
         if(ctx.message.text=="Home")
         {
             const keyboard = new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
             ctx.reply("Choose an option!",keyboard.draw());
 
             return ctx.scene.leave();
         }
 
+        if(ctx.message.text=="Pickup")
+        {
+            delivery="Pickup"
+        }
 
-        let validity;
-        let noPlanYet=false;
+        if(ctx.message.text=="Home Delivery")
+        {
+            delivery="Home Delivery"
+        }
+
+        
+
+
+        let validity=0;
+        // let noPlanYet=false;
 
         const planExists={
 
@@ -133,12 +265,7 @@ const subscriptionScene= new WizardScene(
                
             }
 
-            else{
-
-                noPlanYet=true;
-
-            }
-
+           
           
         
         }
@@ -153,7 +280,7 @@ const subscriptionScene= new WizardScene(
                 if(validity>0)
                 {
                     const keyboard= new Keyboard();
-                    keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+                    keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
                     ctx.reply(`Your plan is still active. Cannot subscribe to new plan! \n You still have ${validity} days remaining `,keyboard.draw());
                     return ctx.scene.leave();
                 }
@@ -161,10 +288,50 @@ const subscriptionScene= new WizardScene(
                 else {
 
                     const plan=ctx.wizard.state.plan;
-                    const amount=ctx.wizard.state.amount;
-                    const cuisine=ctx.message.text;
+                    let amount;
+                    const cuisine=ctx.wizard.state.cuisine;
+                    const pack=ctx.wizard.state.pack;
                     let userId;
                     var count=0;
+
+                    if (plan=="7 day plan")
+                    {
+                        
+                        if(pack=="Regular")
+                        {
+                            amount=600
+                        }
+                        if(pack=="Medium")
+                        {
+                            amount=700
+                        }
+                        if(pack=="Jumbo")
+                        {
+                            amount=800
+                        }
+                    }
+
+                     if (plan=="28 day plan")
+                    {
+                        
+                        if(pack=="Regular")
+                        {
+                            amount=2399
+                        }
+                        if(pack=="Medium")
+                        {
+                            amount=2799
+                        }
+                        if(pack=="Jumbo")
+                        {
+                            amount=2999
+                        }
+                    }
+
+                    if (delivery=="Pickup")
+                    {
+                        amount=amount+100;
+                    }
             
                     const user = {
                         query:`
@@ -223,9 +390,13 @@ const subscriptionScene= new WizardScene(
                                 ctx.wizard.state.paymentId= temp.payment_request.id;
                                 console.log(response.statusCode);
                                 // ctx.reply(temp.payment_request.longurl)
-                                ctx.reply(`Your amount is${amount}`, Markup.inlineKeyboard([
+                                const keyboard= new Keyboard();
+                                keyboard.add("/start");
+                                ctx.reply(`Your amount is${amount}`,keyboard.draw());
+                                ctx.reply("Complete your payment", Markup.inlineKeyboard([
                                     Markup.urlButton('Make Payment', `${temp.payment_request.longurl}`)
                                 ]).extra());
+                                ctx
                                 console.log(body);
                 
                                 
@@ -236,6 +407,8 @@ const subscriptionScene= new WizardScene(
                                         createSubscription(subscriptionInput:{
                                           plan:"${plan}",
                                           cuisine:"${cuisine}",
+                                          pack:"${pack}",
+                                          delivery:"${delivery}",
                                           subscribedUser:"${userId}",
                                           paymentId:"${temp.payment_request.id}",
                                           paymentStatus:"Pending",
@@ -335,7 +508,7 @@ const subscriptionScene= new WizardScene(
                                         }).catch( err => console.log(err))
             
                                         const keyboard=new Keyboard();
-                                        keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+                                        keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
                                         ctx.reply("Subscription Successful!",keyboard.draw());
                                         clearInterval(interval);
                                     }

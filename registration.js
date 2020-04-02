@@ -94,57 +94,6 @@ const  registerScene= new WizardScene(
         const chatId=ctx.from.id
 
 
-        // const checkEmailmobilechatId={
-        //     query:`
-        //     query{
-        //         checkEmailMobile(mobile:"${mobile}",email:"${email}",chatId:"${ctx.from.id}")
-        //         {
-        //           name
-        //         }
-        //       }
-            
-        //     `
-        // }
-
-
-        // await fetch('http://localhost:4000/graphql',{
-        //     method:'POST',
-        //     body:JSON.stringify(checkEmailmobilechatId),
-        //     headers:
-        //     {
-        //         'Content-Type':'application/json'
-        //     }
-        // }).then(res=>{
-        //     if (res.status !== 200 && res.status !==201)
-        //     {
-        //         throw new Error("Failed!");
-        //     }
-        //     return res.json();
-        // }).then(response=> {
-        //     console.log(response);
-        //     if(response.data.checkEmailmobile)
-        //     {
-        //         userexist=true;
-                
-        //     }
-        // }).catch( 
-        //     err => {
-        //         console.log(err)
-        //         ctx.reply("Something went Wrong! :(")
-        //         throw err;
-        //     } )
-
-
-
-
-
-        //     if(userexist)
-        //     {
-        //         const keyboard=new Keyboard();
-        //         keyboard.add("/start")
-        //         ctx.reply("Email ID or Mobile already Exists! Try Again",keyboard.draw());
-        //         return ctx.scene.leave()
-        //     }
         //Build query
         const requestBody ={
             query:`

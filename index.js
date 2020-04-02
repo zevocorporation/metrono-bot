@@ -18,8 +18,12 @@ const scene5 = require("./myAccount");
 const scene6 = require("./subscription");
 const scene7 = require("./myPlan");
 const scene8 = require("./addons");
+const scene9 = require('./viewOrder');
+
 
 //intialize app with bot token
+const URL=process.env.BOT_TOKEN ;
+const PORT=2000;
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // Handler For /start command
@@ -65,7 +69,7 @@ bot.start(ctx => {
         keyboard
           .add("Wallet", "Menu")
           .add("Subscribe Plans", "Order Meals", "Order Addons")
-          .add("My Plans", "My Account");
+          .add("My Plans", "My Account","My Orders");
         ctx.reply(
           "Welcome back " + response.data.userexists.name + " Ready to Order?",
           keyboard.draw()
@@ -85,6 +89,11 @@ bot.start(ctx => {
     .catch(err => console.log(err));
 });
 
+
+
+
+
+
 // Intialize stage object
 // Stages and scenes are used for dialogue between bot and user
 const stage = new Stage();
@@ -98,6 +107,7 @@ stage.register(scene5.accountScene);
 stage.register(scene6.subscriptionScene);
 stage.register(scene7.myplanScene);
 stage.register(scene8.addonScene);
+stage.register(scene9.viewOrderScene);
 
 //Enable session (not currently used)
 bot.use(session());
@@ -110,6 +120,8 @@ bot.action("REGISTER_NOW", ctx => ctx.scene.enter("Register"));
 
 // Callback for order button .Enter into order scene
 bot.hears("Order Meals", ctx => ctx.scene.enter("OrderScene"));
+
+bot.hears("My Orders", ctx => ctx.scene.enter("ViewOrderScene"));
 
 bot.hears("Menu", ctx => ctx.scene.enter("MenuScene"));
 
@@ -200,6 +212,8 @@ bot.action("TOMORROW_MENU", async ctx => {
 
 bot.hears("Wallet", ctx => ctx.scene.enter("WalletScene"));
 
+bot.action("RECHARGE_NOW", ctx => ctx.scene.enter("WalletScene"));
+
 bot.hears("My Account", ctx => ctx.scene.enter("AccountScene"));
 
 bot.hears("Subscribe Plans", ctx => ctx.scene.enter("SubscriptionScene"));
@@ -208,4 +222,9 @@ bot.hears("My Plans", ctx => ctx.scene.enter("MyPlanScene"));
 
 bot.hears("Order Addons", ctx => ctx.scene.enter("AddonScene"));
 
-bot.launch();
+bot.action("SUBSCRIBE_NOW", ctx => ctx.scene.enter("SubscriptionScene"))
+
+
+bot.telegram.setWebhook(`${URL}bot${BOT_TOKEN}`)
+
+bot.startWebhook(`/bot${BOT_TOKEN}`, null, 5000)

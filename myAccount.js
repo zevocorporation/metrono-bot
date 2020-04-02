@@ -8,6 +8,8 @@ const accountScene= new WizardScene(
     'AccountScene',
     async ctx=>{
 
+        let notRegistered=false;
+
         const user={
             query:`
 
@@ -42,7 +44,31 @@ const accountScene= new WizardScene(
             return res.json();
         }).then(response=> {
             console.log(response);
-            ctx.reply(`Current Account details: \n Name : ${response.data.userexists.name} \n Mobile : ${response.data.userexists.mobile} \n Email : ${response.data.userexists.email} \n Address : ${response.data.userexists.address} ` )
+            if(response.data.userexists)
+            {
+                ctx.reply(`Current Account details: \n Name : ${response.data.userexists.name} \n Mobile : ${response.data.userexists.mobile} \n Email : ${response.data.userexists.email} \n Address : ${response.data.userexists.address} ` )
+
+                
+
+            }
+
+            else
+            {
+                ctx.reply(
+                    "Sorry you have to register first!",
+                    Markup.inlineKeyboard([
+                      Markup.callbackButton("Register", "REGISTER_NOW")
+                    ]).extra()
+                  );
+
+                  notRegistered=true;
+
+                  
+            }
+
+           
+
+            
          
             
         }).catch( 
@@ -51,6 +77,12 @@ const accountScene= new WizardScene(
                 ctx.reply("Something went Wrong! :(")
                 throw err;
             } )
+
+
+            if(notRegistered)
+            {
+                return ctx.scene.leave();
+            }
 
         const keyboard=new Keyboard();
         keyboard.add("Change mobile number").add("Change delivery address").add("Change email").add("Home");
@@ -71,7 +103,7 @@ const accountScene= new WizardScene(
         if(ctx.message.text=="Home")
         {
             const keyboard = new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
             ctx.reply("Choose an option!",keyboard.draw());
 
             return ctx.scene.leave();
@@ -111,7 +143,7 @@ const accountScene= new WizardScene(
             if (changeData.length!=10)
         {
             const keyboard = new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
             ctx.reply("Please Enter a valid Mobile number",keyboard.draw());
             
             return ctx.scene.leave();
@@ -122,7 +154,7 @@ const accountScene= new WizardScene(
             if((changeData[i]>='a' && changeData[i]<='z')||(changeData[i]>='A' && changeData[i]<='Z'))
             {
                 const keyboard = new Keyboard();
-                keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+                keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
                 ctx.reply("Please Enter a valid Mobile number",keyboard.draw());
                 return ctx.scene.leave();
             
@@ -134,7 +166,7 @@ const accountScene= new WizardScene(
             if(!changeData.includes('@'))
         {
             const keyboard = new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
             ctx.reply("Please Enter a valid Email",keyboard.draw());
             
             return ctx.scene.leave();
@@ -143,7 +175,7 @@ const accountScene= new WizardScene(
         if(!changeData.includes('.'))
         {
             const keyboard = new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
             ctx.reply("Please Enter a valid Email");
             
             return ctx.scene.leave();
@@ -154,7 +186,7 @@ const accountScene= new WizardScene(
         if(ctx.message.text=="Home")
         {
             const keyboard = new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
             ctx.reply("Choose an option!",keyboard.draw());
 
             return ctx.scene.leave();
@@ -195,7 +227,7 @@ const accountScene= new WizardScene(
         }).then(response=> {
             console.log(response);
             const keyboard=new Keyboard();
-            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account');
+            keyboard.add('Wallet','Menu').add('Subscribe Plans','Order Meals','Order Addons').add('My Plans','My Account','My Orders');
 
             ctx.reply("Your details are updated!",keyboard.draw());
          
@@ -203,8 +235,8 @@ const accountScene= new WizardScene(
         }).catch( 
             err => {
                 console.log(err)
-                ctx.reply("Something went Wrong! :(")
-                throw err;
+                ctx.reply("Something went Wrong! :( Try again")
+                // throw err;
             } )
 
             
