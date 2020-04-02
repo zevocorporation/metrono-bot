@@ -27,7 +27,7 @@ const walletScene= new WizardScene(
       
         //Send request to graphql api about current user
       
-        await fetch("http://localhost:4000/graphql", {
+        await fetch("https://metrono-backend.herokuapp.com/graphql", {
           method: "POST",
           body: JSON.stringify(userExists),
           headers: {
@@ -127,7 +127,7 @@ const walletScene= new WizardScene(
                 `
             }
 
-            await fetch('http://localhost:4000/graphql',{
+            await fetch('https://metrono-backend.herokuapp.com/graphql',{
             method:'POST',
             body:JSON.stringify(getCredits),
             headers:
@@ -224,7 +224,7 @@ const walletScene= new WizardScene(
         `
     }
 
-    await fetch('http://localhost:4000/graphql',{
+    await fetch('https://metrono-backend.herokuapp.com/graphql',{
     method:'POST',
             body:JSON.stringify(getCredits),
             headers:
@@ -263,7 +263,7 @@ const walletScene= new WizardScene(
     }
 
 
-    await fetch('http://localhost:4000/graphql',{
+    await fetch('https://metrono-backend.herokuapp.com/graphql',{
         method:'POST',
         body:JSON.stringify(user),
         headers:
@@ -329,7 +329,7 @@ const walletScene= new WizardScene(
                     `
                 }
 
-                fetch('http://localhost:4000/graphql',{
+                fetch('https://metrono-backend.herokuapp.com/graphql',{
                                 method:'POST',
                                 body:JSON.stringify(wallet),
                                 headers:
@@ -410,7 +410,7 @@ const walletScene= new WizardScene(
                                     `
                                 }
                                 
-                                 fetch('http://localhost:4000/graphql',{
+                                 fetch('https://metrono-backend.herokuapp.com/graphql',{
                                 method:'POST',
                                 body:JSON.stringify(updateWalletPaymentStatus),
                                 headers:
@@ -427,7 +427,7 @@ const walletScene= new WizardScene(
                                 console.log(response);
                             }).catch( err => console.log(err))
 
-                            fetch('http://localhost:4000/graphql',{
+                            fetch('https://metrono-backend.herokuapp.com/graphql',{
                                 method:'POST',
                                 body:JSON.stringify(setCredits),
                                 headers:

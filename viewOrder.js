@@ -26,7 +26,7 @@ const viewOrderScene=new WizardScene(
   
     //Send request to graphql api about current user
   
-    await fetch("http://localhost:4000/graphql", {
+    await fetch("https://metrono-backend.herokuapp.com/graphql", {
       method: "POST",
       body: JSON.stringify(userExists),
       headers: {
@@ -120,7 +120,7 @@ const viewOrderScene=new WizardScene(
         {
            
 
-            await fetch('http://localhost:4000/graphql',{
+            await fetch('https://metrono-backend.herokuapp.com/graphql',{
                 method:'POST',
                 body:JSON.stringify(getOrders),
                 headers:
@@ -207,7 +207,7 @@ const viewOrderScene=new WizardScene(
 
         if(ctx.message.text=="Order History")
         {
-            await fetch('http://localhost:4000/graphql',{
+            await fetch('https://metrono-backend.herokuapp.com/graphql',{
                 method:'POST',
                 body:JSON.stringify(getOrders),
                 headers:

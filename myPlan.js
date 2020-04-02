@@ -21,7 +21,7 @@ const myplanScene = new WizardScene(
 
     //Send request to graphql api about current user
 
-    await fetch("http://localhost:4000/graphql", {
+    await fetch("https://metrono-backend.herokuapp.com/graphql", {
       method: "POST",
       body: JSON.stringify(userExists),
       headers: {
@@ -72,7 +72,7 @@ const myplanScene = new WizardScene(
             `
     };
 
-    await fetch("http://localhost:4000/graphql", {
+    await fetch("https://metrono-backend.herokuapp.com/graphql", {
       method: "POST",
       body: JSON.stringify(plan),
       headers: {
@@ -247,7 +247,7 @@ const myplanScene = new WizardScene(
                 `
       };
 
-      await fetch("http://localhost:4000/graphql", {
+      await fetch("https://metrono-backend.herokuapp.com/graphql", {
         method: "POST",
         body: JSON.stringify(changeCuisine),
         headers: {

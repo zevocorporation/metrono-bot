@@ -123,7 +123,7 @@ const  registerScene= new WizardScene(
    
         //Use fetch api to communicate with mongo DB
         //Fetch method returns a promise
-       await fetch('http://localhost:4000/graphql',{
+       await fetch('https://metrono-backend.herokuapp.com/graphql',{
             method:'POST',
             body:JSON.stringify(requestBody),
             headers:

@@ -49,7 +49,7 @@ bot.start(ctx => {
 
   //Send request to graphql api about current user
 
-  fetch("http://localhost:4000/graphql", {
+  fetch("https://metrono-backend.herokuapp.com/graphql", {
     method: "POST",
     body: JSON.stringify(userExists),
     headers: {
@@ -225,6 +225,8 @@ bot.hears("Order Addons", ctx => ctx.scene.enter("AddonScene"));
 bot.action("SUBSCRIBE_NOW", ctx => ctx.scene.enter("SubscriptionScene"))
 
 
-bot.telegram.setWebhook(`${URL}bot${BOT_TOKEN}`)
+// bot.telegram.setWebhook(`${URL}bot${BOT_TOKEN}`)
 
-bot.startWebhook(`/bot${BOT_TOKEN}`, null, 5000)
+// bot.startWebhook(`/bot${BOT_TOKEN}`, null, 5000)
+
+bot.launch();

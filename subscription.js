@@ -25,7 +25,7 @@ const subscriptionScene= new WizardScene(
   
     //Send request to graphql api about current user
   
-    await fetch("http://localhost:4000/graphql", {
+    await fetch("https://metrono-backend.herokuapp.com/graphql", {
       method: "POST",
       body: JSON.stringify(userExists),
       headers: {
@@ -228,7 +228,7 @@ const subscriptionScene= new WizardScene(
             `
         }
 
-        await fetch('http://localhost:4000/graphql',{
+        await fetch('https://metrono-backend.herokuapp.com/graphql',{
             method:'POST',
             body:JSON.stringify(planExists),
             headers:
@@ -345,7 +345,7 @@ const subscriptionScene= new WizardScene(
                     }
                 
                 
-                    await fetch('http://localhost:4000/graphql',{
+                    await fetch('https://metrono-backend.herokuapp.com/graphql',{
                         method:'POST',
                         body:JSON.stringify(user),
                         headers:
@@ -422,7 +422,7 @@ const subscriptionScene= new WizardScene(
                                     `
                                 }
                 
-                                fetch('http://localhost:4000/graphql',{
+                                fetch('https://metrono-backend.herokuapp.com/graphql',{
                                                 method:'POST',
                                                 body:JSON.stringify(Subscription),
                                                 headers:
@@ -490,7 +490,7 @@ const subscriptionScene= new WizardScene(
                                             }
                                         
             
-                                        fetch('http://localhost:4000/graphql',{
+                                        fetch('https://metrono-backend.herokuapp.com/graphql',{
                                             method:'POST',
                                             body:JSON.stringify(updatePaymentStatus),
                                             headers:

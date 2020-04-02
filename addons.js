@@ -21,7 +21,7 @@ const addonScene = new WizardScene(
 
     //Send request to graphql api about current user
 
-    await fetch("http://localhost:4000/graphql", {
+    await fetch("https://metrono-backend.herokuapp.com/graphql", {
       method: "POST",
       body: JSON.stringify(userExists),
       headers: {
@@ -283,7 +283,7 @@ const addonScene = new WizardScene(
      `
     };
 
-    await fetch("http://localhost:4000/graphql", {
+    await fetch("https://metrono-backend.herokuapp.com/graphql", {
       method: "POST",
       body: JSON.stringify(userIdQuery),
       headers: {
@@ -327,7 +327,7 @@ const addonScene = new WizardScene(
             `
     };
 
-    await fetch("http://localhost:4000/graphql", {
+    await fetch("https://metrono-backend.herokuapp.com/graphql", {
       method: "POST",
       body: JSON.stringify(getCredits),
       headers: {
@@ -382,7 +382,7 @@ const addonScene = new WizardScene(
                 `
       };
 
-      await fetch("http://localhost:4000/graphql", {
+      await fetch("https://metrono-backend.herokuapp.com/graphql", {
         method: "POST",
         body: JSON.stringify(updateCredits),
         headers: {
@@ -431,7 +431,7 @@ const addonScene = new WizardScene(
                 `
           };
 
-          fetch("http://localhost:4000/graphql", {
+          fetch("https://metrono-backend.herokuapp.com/graphql", {
             method: "POST",
             body: JSON.stringify(orderMutation),
             headers: {

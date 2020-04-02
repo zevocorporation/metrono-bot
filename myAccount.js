@@ -29,7 +29,7 @@ const accountScene= new WizardScene(
             `
         }
 
-        await fetch('http://localhost:4000/graphql',{
+        await fetch('https://metrono-backend.herokuapp.com/graphql',{
             method:'POST',
             body:JSON.stringify(user),
             headers:
@@ -211,7 +211,7 @@ const accountScene= new WizardScene(
             `
         }
 
-        await fetch('http://localhost:4000/graphql',{
+        await fetch('https://metrono-backend.herokuapp.com/graphql',{
             method:'POST',
             body:JSON.stringify(updateUser),
             headers:
