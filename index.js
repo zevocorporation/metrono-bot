@@ -21,17 +21,19 @@ const scene8 = require("./addons");
 const scene9 = require('./viewOrder');
 
 
-//intialize app with bot token
+// intialize app with bot token
 const URL = process.env.URL; 
 const BOT_TOKEN = process.env.BOT_TOKEN ;
 const PORT = process.env.PORT || 5000;
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
+// const bot = new Telegraf("1042039654:AAF6QoQG5Ten7_CMmGxSPymbh2FeLOfNSmk");
+
 // Handler For /start command
 // ctx is context object.Holds many properties about curent chat
 // reply method to send message from bot
 
-bot.start(ctx => {
+bot.start(async ctx => {
   //get current chat ID
   const chatId = ctx.from.id;
 
@@ -50,7 +52,7 @@ bot.start(ctx => {
 
   //Send request to graphql api about current user
 
-  fetch("https://metrono-backend.herokuapp.com/graphql", {
+  await fetch("https://metrono-backend.herokuapp.com/graphql", {
     method: "POST",
     body: JSON.stringify(userExists),
     headers: {
