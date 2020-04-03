@@ -134,37 +134,37 @@ bot.action("TODAY", async ctx => {
 
   await ctx.reply("Today's Menu:");
   if (currenDay == "Mon") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : MonBreakfast \n \nLunch : MonLunch \n \nDinner : MonDinner "
     );
   }
   if (currenDay == "Tue") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : TueBreakfast \n \nLunch : TueLunch \n \nDinner : TueDinner "
     );
   }
   if (currenDay == "Wed") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : WedBreakfast \n \nLunch : WedLunch \n\n Dinner : WedDinner "
     );
   }
   if (currenDay == "Thu") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : ThuBreakfast \n \nLunch : ThuLunch \n\n Dinner : ThuDinner "
     );
   }
   if (currenDay == "Fri") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : FriBreakfast \n \nLunch : FriLunch \n\n Dinner : FriDinner "
     );
   }
   if (currenDay == "Sat") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : SatBreakfast \n \nLunch : SatLunch \n \nDinner : SatDinner "
     );
   }
   if (currenDay == "Sun") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : SunBreakfast \n \n Lunch : SunLunch \n \n Dinner :SunDinner "
     );
   }
@@ -177,37 +177,37 @@ bot.action("TOMORROW_MENU", async ctx => {
   const tomorrowDay = tomorrow.toDateString().substring(0, 3);
   await ctx.reply("Tomorrow's Menu:");
   if (tomorrowDay == "Mon") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : MonBreakfast \n \n Lunch : MonLunch \n \n Dinner : MonDinner "
     );
   }
   if (tomorrowDay == "Tue") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : TueBreakfast \n \n Lunch : TueLunch \n \n Dinner : TueDinner "
     );
   }
   if (tomorrowDay == "Wed") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : WedBreakfast \n \n Lunch : WedLunch \n \n Dinner : WedDinner "
     );
   }
   if (tomorrowDay == "Thu") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : ThuBreakfast \n \n Lunch : ThuLunch \n \n Dinner : ThuDinner "
     );
   }
   if (tomorrowDay == "Fri") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : FriBreakfast \n \n Lunch : FriLunch \n \n Dinner : FriDinner "
     );
   }
   if (tomorrowDay == "Sat") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : SatBreakfast \n \n Lunch : SatLunch \n \n Dinner : SatDinner "
     );
   }
   if (tomorrowDay == "Sun") {
-    ctx.reply(
+    await ctx.reply(
       "Breakfast : SunBreakfast \n \n Lunch : SunLunch \n \n Dinner :SunDinner "
     );
   }

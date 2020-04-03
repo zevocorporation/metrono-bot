@@ -133,7 +133,7 @@ const viewOrderScene=new WizardScene(
                     throw new Error("Failed!");
                 }
                 return res.json();
-            }).then(response=> {
+            }).then( async response=> {
                 // console.log(response);
                 let count=0;
 
@@ -180,7 +180,7 @@ const viewOrderScene=new WizardScene(
 
                 else
                 {
-                    ctx.reply("You have no current any orders!")
+                    await ctx.reply("You have no current any orders!")
                 }
                 
                 
@@ -220,7 +220,7 @@ const viewOrderScene=new WizardScene(
                     throw new Error("Failed!");
                 }
                 return res.json();
-            }).then( response=> {
+            }).then( async response=> {
                 // console.log(response);
                 let count=0;
                 for(i=0;i<response.data.getCurrentOrders.length;i++)
@@ -264,7 +264,7 @@ const viewOrderScene=new WizardScene(
 
                 }
                 else{
-                     ctx.reply("Your order history is empty!");
+                    await ctx.reply("Your order history is empty!");
                 }
 
 
