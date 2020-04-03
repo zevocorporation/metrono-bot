@@ -395,7 +395,7 @@ const addonScene = new WizardScene(
           }
           return res.json();
         })
-        .then(response => {
+        .then(async response => {
           console.log(response);
           const orderMutation = {
             query: `
@@ -431,7 +431,7 @@ const addonScene = new WizardScene(
                 `
           };
 
-          fetch("https://metrono-backend.herokuapp.com/graphql", {
+          await fetch("https://metrono-backend.herokuapp.com/graphql", {
             method: "POST",
             body: JSON.stringify(orderMutation),
             headers: {
