@@ -132,7 +132,7 @@ bot.action("TODAY", async ctx => {
   const date = new Date();
   const currenDay = date.toDateString().substring(0, 3);
 
-  //  ctx.reply("Today's Menu:");
+   ctx.reply("Today's Menu:");
   if (currenDay == "Mon") {
     await ctx.reply(
       "Breakfast : MonBreakfast \n \nLunch : MonLunch \n \nDinner : MonDinner "
