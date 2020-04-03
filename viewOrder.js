@@ -180,7 +180,7 @@ const viewOrderScene=new WizardScene(
 
                 else
                 {
-                    await ctx.reply("You have no current any orders!")
+                   ctx.reply("You have no current any orders!")
                 }
                 
                 
@@ -192,7 +192,7 @@ const viewOrderScene=new WizardScene(
                 } )
 
 
-                ctx.reply("Choose an option",startkeyboard.draw())
+                await ctx.reply("Choose an option",startkeyboard.draw())
 
 
                 return ctx.scene.leave();
@@ -264,7 +264,7 @@ const viewOrderScene=new WizardScene(
 
                 }
                 else{
-                    await ctx.reply("Your order history is empty!");
+                     ctx.reply("Your order history is empty!");
                 }
 
 
@@ -278,7 +278,7 @@ const viewOrderScene=new WizardScene(
                 } )
 
 
-                ctx.reply("Choose an option!",startkeyboard.draw())
+                await ctx.reply("Choose an option!",startkeyboard.draw())
 
 
                 return ctx.scene.leave();
