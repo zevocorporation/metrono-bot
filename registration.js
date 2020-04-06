@@ -17,7 +17,7 @@ const  registerScene= new WizardScene(
     "Register",
 
     ctx=> {
-        ctx.reply("Please enter your name.");
+        ctx.reply("Please edo the honour of entering your name.");
         
         // To go to next function
         return ctx.wizard.next();
@@ -29,7 +29,7 @@ const  registerScene= new WizardScene(
         //A state object to pass data across functions. Somewhat like sessions
         ctx.wizard.state.yourName=ctx.message.text;
 
-        ctx.reply("Enter your mobile number");
+        ctx.reply("Enter your number");
         return ctx.wizard.next();
     },
 
@@ -39,7 +39,7 @@ const  registerScene= new WizardScene(
         // Validation
         if (mobile.length!=10)
         {
-            ctx.reply("Please Enter a valid mobile number");
+            ctx.reply("Please enter a valid number");
             
             return;
         }
@@ -47,7 +47,7 @@ const  registerScene= new WizardScene(
         {
             if((mobile[i]>='a' && mobile[i]<='z')||(mobile[i]>='A' && mobile[i]<='Z'))
             {
-                ctx.reply("Please Enter a valid mobile number");
+                ctx.reply("Please enter a valid number");
             
             return;
             }
@@ -55,7 +55,7 @@ const  registerScene= new WizardScene(
 
        
         ctx.wizard.state.yourMobile=ctx.message.text;
-        ctx.reply("Enter your Email");
+        ctx.reply("State your Email Id please");
         return ctx.wizard.next();
 
     },
@@ -66,21 +66,21 @@ const  registerScene= new WizardScene(
 
         if(!email.includes('@'))
         {
-            ctx.reply("Please Enter a valid Email");
+            ctx.reply("Please enter a valid Email");
             
             return;
 
         }
         if(!email.includes('.'))
         {
-            ctx.reply("Please Enter a valid Email");
+            ctx.reply("Please enter a valid Email");
             
             return;
 
         }
         
         ctx.wizard.state.yourEmail=ctx.message.text
-        ctx.reply("Enter your Address");
+        ctx.reply("Final request to enter your address");
         return ctx.wizard.next();
     },
    async ctx=>{

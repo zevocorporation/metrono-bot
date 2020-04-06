@@ -74,7 +74,7 @@ bot.start(async ctx => {
           .add("Subscribe Plans", "Order Meals", "Order Addons")
           .add("My Plans", "My Account","My Orders");
         ctx.reply(
-          "Welcome back " + response.data.userexists.name + " Ready to Order?",
+          "Hi" + response.data.userexists.name + " .How can we help you order today!",
           keyboard.draw()
         );
       }
@@ -82,7 +82,7 @@ bot.start(async ctx => {
       // Else Prompt user to register and show inline register button
       else {
         ctx.reply(
-          "click the below button to register!",
+          "Lets get started ! Click the below button and match the follow ups!",
           Markup.inlineKeyboard([
             Markup.callbackButton("Register", "REGISTER_NOW")
           ]).extra()
@@ -132,7 +132,7 @@ bot.action("TODAY", async ctx => {
   const date = new Date();
   const currenDay = date.toDateString().substring(0, 3);
 
-   ctx.reply("Today's Menu:");
+  //  ctx.reply("Today's Menu:");
   if (currenDay == "Mon") {
     await ctx.reply(
       "Breakfast : MonBreakfast \n \nLunch : MonLunch \n \nDinner : MonDinner "

@@ -56,7 +56,7 @@ const orderScene = new WizardScene(
 
     const keyboard = new Keyboard();
     keyboard.add("Today", "Tomorrow").add("Home");
-    ctx.reply("Select your order day", keyboard.draw());
+    ctx.reply("Select your day of order", keyboard.draw());
     return ctx.wizard.next();
   },
   ctx => {
@@ -85,7 +85,7 @@ const orderScene = new WizardScene(
     ctx.wizard.state.orderFor = ctx.message.text;
     const keyboard = new Keyboard();
     keyboard.add("South Indian", "North Indian").add("Home");
-    ctx.reply("Select your cuisine", keyboard.draw());
+    ctx.reply("Help yourself with the cuisine", keyboard.draw());
     return ctx.wizard.next();
   },
   ctx => {
@@ -121,7 +121,7 @@ const orderScene = new WizardScene(
       ctx.wizard.state.cuisine = ctx.message.text;
       const keyboard = new Keyboard();
       keyboard.add("Lunch", "Dinner").add("Home");
-      ctx.reply("Choose your timing", keyboard.draw());
+      ctx.reply("Name your timing", keyboard.draw());
       return ctx.wizard.next();
     }
   },
@@ -159,7 +159,7 @@ const orderScene = new WizardScene(
       if (time > lunchTime) {
         const keyboard = new Keyboard();
         keyboard.add("Home");
-        ctx.reply("Lunch orders are Closed!", keyboard.draw());
+        ctx.reply("Apologies! We have close lunch orders for today!", keyboard.draw());
         return ctx.wizard.next();
       }
     }
@@ -167,14 +167,14 @@ const orderScene = new WizardScene(
       if (time > dinnerTime) {
         const keyboard = new Keyboard();
         keyboard.add("Home");
-        ctx.reply("Dinner orders are Closed!", keyboard.draw());
+        ctx.reply("Apologies! We have close dinner orders for today!", keyboard.draw());
         return ctx.wizard.next();
       }
     }
     ctx.wizard.state.orderType = ctx.message.text;
     const keyboard = new Keyboard();
     keyboard.add("Regular", "Medium", "Jumbo").add("Home");
-    ctx.reply("Choose size of your order", keyboard.draw());
+    ctx.reply("Choose your order size", keyboard.draw());
     return ctx.wizard.next();
   },
 
@@ -205,7 +205,7 @@ const orderScene = new WizardScene(
     ctx.wizard.state.size = ctx.message.text;
     const keyboard = new Keyboard();
     keyboard.add("1", "2", "3", "4", "5").add("Home");
-    ctx.reply("Choose quantity of your order", keyboard.draw());
+    ctx.reply("What quantity would you prefer?", keyboard.draw());
     return ctx.wizard.next();
   },
   async ctx => {
@@ -325,7 +325,7 @@ const orderScene = new WizardScene(
             keyboard.add("/start");
 
             // ctx.reply(temp.payment_request.longurl)
-            ctx.reply(`Your order amount is${amount}`, keyboard.draw());
+            ctx.reply(`The amount of your order is ${amount}`, keyboard.draw());
             ctx.reply(
               `Complete your payment! or Go back!`,
               Markup.inlineKeyboard([

@@ -55,7 +55,7 @@ const addonScene = new WizardScene(
 
     const keyboard = new Keyboard();
     keyboard.add("Today", "Tomorrow").add("Home");
-    ctx.reply("Purchase addons for...", keyboard.draw());
+    ctx.reply("Select your dau of order", keyboard.draw());
     return ctx.wizard.next();
   },
   ctx => {
@@ -86,7 +86,7 @@ const addonScene = new WizardScene(
       .add("Egg Masala 100 credits", "Chicken Gravy 200 Credits")
       .add("Panner Tikka 150 Credits", "Panner Butter Masala 250 Credits")
       .add("Home");
-    ctx.reply("Choose your Addon", keyboard.draw());
+    ctx.reply("Select an item from the menu!", keyboard.draw());
     return ctx.wizard.next();
   },
 
@@ -124,7 +124,7 @@ const addonScene = new WizardScene(
       ctx.wizard.state.addons = ctx.message.text;
       const keyboard = new Keyboard();
       keyboard.add("Lunch", "Dinner").add("Home");
-      ctx.reply("Choose your timing", keyboard.draw());
+      ctx.reply("State your timing", keyboard.draw());
       return ctx.wizard.next();
     }
   },
@@ -163,7 +163,7 @@ const addonScene = new WizardScene(
       if (time > lunchTime) {
         const keyboard = new Keyboard();
         keyboard.add("Home");
-        ctx.reply("Lunch orders are Closed!", keyboard.draw());
+        ctx.reply("Apologies! Lunch orders are Closed!", keyboard.draw());
         return ctx.wizard.next();
       }
     }
@@ -171,14 +171,14 @@ const addonScene = new WizardScene(
       if (time > dinnerTime) {
         const keyboard = new Keyboard();
         keyboard.add("Home");
-        ctx.reply("Dinner orders are Closed!", keyboard.draw());
+        ctx.reply("Apologies ! Dinner orders are Closed!", keyboard.draw());
         return ctx.wizard.next();
       }
     }
     ctx.wizard.state.orderType = ctx.message.text;
     const keyboard = new Keyboard();
     keyboard.add("1", "2", "3").add("Home");
-    ctx.reply("Choose Quantity...", keyboard.draw());
+    ctx.reply("What quantity would you prefer ?", keyboard.draw());
     return ctx.wizard.next();
   },
 
