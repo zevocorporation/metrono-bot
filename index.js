@@ -74,7 +74,7 @@ bot.start(async ctx => {
           .add("Subscribe Plans", "Order Meals", "Order Addons")
           .add("My Plans", "My Account","My Orders");
         ctx.reply(
-          "Hi " + response.data.userexists.name + "! .How can we help you order today!",
+          "Hi " + response.data.userexists.name + "! .How can we help you order today?",
           keyboard.draw()
         );
       }
