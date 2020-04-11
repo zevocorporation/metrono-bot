@@ -180,7 +180,7 @@ const viewOrderScene=new WizardScene(
 
                 else
                 {
-                   ctx.reply("You have no current any orders!")
+                   ctx.reply("You have no current any orders! Processing and orders out for delivery will appear here")
                 }
                 
                 
@@ -264,7 +264,7 @@ const viewOrderScene=new WizardScene(
 
                 }
                 else{
-                     ctx.reply("Your order history is empty!");
+                     ctx.reply("Your delivered orders will appear here. Your order history is empty!");
                 }
 
 

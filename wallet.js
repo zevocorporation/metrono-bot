@@ -475,7 +475,7 @@ const walletScene= new WizardScene(
 
                     }
                 });
-                ctx.reply("Session Expired try again");
+                // ctx.reply("Session Expired try again");
                 clearInterval(interval);
             }
         },3000);
