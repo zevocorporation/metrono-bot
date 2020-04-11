@@ -55,7 +55,7 @@ const addonScene = new WizardScene(
 
     const keyboard = new Keyboard();
     keyboard.add("Today", "Tomorrow").add("Home");
-    ctx.reply("Select your dau of order", keyboard.draw());
+    ctx.reply("Select your day of order", keyboard.draw());
     return ctx.wizard.next();
   },
   ctx => {
