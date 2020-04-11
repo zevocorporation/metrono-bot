@@ -17,7 +17,7 @@ const  registerScene= new WizardScene(
     "Register",
 
     ctx=> {
-        ctx.reply("Please edo the honour of entering your name.");
+        ctx.reply("Please do the honour of entering your name.");
         
         // To go to next function
         return ctx.wizard.next();
@@ -80,7 +80,7 @@ const  registerScene= new WizardScene(
         }
         
         ctx.wizard.state.yourEmail=ctx.message.text
-        ctx.reply("Final request to enter your address");
+        ctx.reply("Final request to enter your delivery address");
         return ctx.wizard.next();
     },
    async ctx=>{
