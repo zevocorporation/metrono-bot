@@ -83,61 +83,101 @@ const orderScene = new WizardScene(
     }
 
     ctx.wizard.state.orderFor = ctx.message.text;
-    const keyboard = new Keyboard();
-    keyboard.add("South Indian", "North Indian").add("Home");
-    ctx.reply("Help yourself with the cuisine", keyboard.draw());
+    const timingKeys = new Keyboard();
+
+    function checkTime(i) {
+      if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+      return i;
+    }
+    const today = new Date();
+    let h = today.getHours();
+    let m = today.getMinutes();
+    let s = today.getSeconds();
+    h=checkTime(h)
+    m = checkTime(m);
+    s = checkTime(s);
+    // const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    const time= h + ":" + m + ":" + s;
+    // console.log(time);
+    const lunchTime = "10:30:00";
+    const dinnerTime = "17:30:00";
+
+    if (ctx.message.text=="Today")
+    {
+      if (time<lunchTime)
+      {
+        timingKeys.add("Lunch","Dinner").add("Home")
+      }
+      else if (time > lunchTime && time <dinnerTime)
+      {
+        ctx.reply("Lunch orders are closed by 10:30 am")
+        timingKeys.add("Dinner").add("Home")
+      }
+      else if (time > lunchTime && time > dinnerTime)
+      {
+        
+        ctx.reply("Apologies! Today's Orders are closed. You can order for tommorrow");
+        return ;
+      }
+    }
+
+    if (ctx.message.text=="Tomorrow")
+    {
+      timingKeys.add("Breakfast","Lunch","Dinner").add("Home")
+    }
+
+   
+    ctx.reply("Choose your timing", timingKeys.draw());
     return ctx.wizard.next();
   },
   ctx => {
     if (
-      ctx.message.text != "South Indian" &&
-      ctx.message.text != "North Indian" &&
-      ctx.message.text != "Home"
-    ) {
-      const keyboard = new Keyboard();
-      keyboard.add("Home");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.wizard.next();
-    }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
-      return ctx.scene.leave();
-    }
-
-    if (ctx.wizard.state.orderFor == "Tomorrow") {
-      ctx.wizard.state.cuisine = ctx.message.text;
-      const keyboard = new Keyboard();
-      keyboard.add("Breakfast", "Lunch", "Dinner").add("Home");
-      ctx.reply("Choose your timing", keyboard.draw());
-      return ctx.wizard.next();
-    } else if (ctx.wizard.state.orderFor == "Today") {
-      ctx.wizard.state.cuisine = ctx.message.text;
-      const keyboard = new Keyboard();
-      keyboard.add("Lunch", "Dinner").add("Home");
-      ctx.reply("Name your timing", keyboard.draw());
-      return ctx.wizard.next();
-    }
-  },
-
-  ctx => {
-    const today = new Date();
-    const time =
-      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    const lunchTime = "10:30:00";
-    const dinnerTime = "17:30:00";
-
-    if (
       ctx.message.text != "Breakfast" &&
       ctx.message.text != "Lunch" &&
       ctx.message.text != "Dinner" &&
-      ctx.message.text != "Home"
+      ctx.message.text != "Home" 
+     
+    ) {
+      const keyboard = new Keyboard();
+      keyboard.add("Home");
+      ctx.reply("Please Choose from given options!", keyboard.draw());
+      return ctx.wizard.next();
+    }
+
+    // if (ctx.message.text=="Tomorrow")
+    // {
+    //   return;
+    // }
+
+    if (ctx.message.text == "Home") {
+      const keyboard = new Keyboard();
+      keyboard
+        .add("Wallet", "Menu")
+        .add("Subscribe Plans", "Order Meals", "Order Addons")
+        .add("My Plans", "My Account", "My Orders");
+      ctx.reply("Choose an option!", keyboard.draw());
+
+      return ctx.scene.leave();
+    }
+
+    ctx.wizard.state.orderType=ctx.message.text;
+
+    const keyboard= new Keyboard()
+    keyboard.add("North Indian","South Indian").add("Home")
+    ctx.reply("Choose your cuisine",keyboard.draw())
+    return ctx.wizard.next();
+
+  
+  },
+
+  ctx => {
+
+    if (
+      ctx.message.text != "North Indian" &&
+      ctx.message.text != "South Indian" &&
+      
+      ctx.message.text != "Home" 
+     
     ) {
       const keyboard = new Keyboard();
       keyboard.add("Home");
@@ -155,23 +195,9 @@ const orderScene = new WizardScene(
 
       return ctx.scene.leave();
     }
-    if (ctx.message.text == "Lunch" && ctx.wizard.state.orderFor == "Today") {
-      if (time > lunchTime) {
-        const keyboard = new Keyboard();
-        keyboard.add("Home");
-        ctx.reply("Apologies! We have close lunch orders for today!", keyboard.draw());
-        return ctx.wizard.next();
-      }
-    }
-    if (ctx.message.text == "Dinner" && ctx.wizard.state.orderFor == "Today") {
-      if (time > dinnerTime) {
-        const keyboard = new Keyboard();
-        keyboard.add("Home");
-        ctx.reply("Apologies! We have close dinner orders for today!", keyboard.draw());
-        return ctx.wizard.next();
-      }
-    }
-    ctx.wizard.state.orderType = ctx.message.text;
+
+    ctx.wizard.state.cuisine=ctx.message.text;
+   
     const keyboard = new Keyboard();
     keyboard.add("Regular", "Medium", "Jumbo").add("Home");
     ctx.reply("Choose your order size", keyboard.draw());
