@@ -98,7 +98,7 @@ const orderScene = new WizardScene(
     s = checkTime(s);
     // const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     const time= h + ":" + m + ":" + s;
-    // console.log(time);
+    console.log(time);
     const lunchTime = "10:30:00";
     const dinnerTime = "17:30:00";
 
