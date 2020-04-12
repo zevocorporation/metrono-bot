@@ -351,6 +351,7 @@ const orderScene = new WizardScene(
             keyboard.add("/start");
 
             // ctx.reply(temp.payment_request.longurl)
+            ctx.reply("You use this test card for payment \n Card no: 4242 4242 4242 4242 \n Exp date: 04/21 \n cvv: 111 \n juspay code: 1221 ")
             ctx.reply(`The amount of your order is ${amount}`, keyboard.draw());
             ctx.reply(
               `Complete your payment! or Go back!`,

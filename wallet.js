@@ -310,6 +310,7 @@ const walletScene= new WizardScene(
                 // ctx.reply(temp.payment_request.longurl)
                 const keyboard= new Keyboard();
                 keyboard.add("/start");
+                ctx.reply("You use this test card for payment \n Card no: 4242 4242 4242 4242 \n Exp date: 04/21 \n cvv: 111 \n juspay code: 1221 ")
                 ctx.reply(`Your amount is Rs.${amount}`,keyboard.draw())
                 ctx.reply(`Click below to Pay`, Markup.inlineKeyboard([
                     Markup.urlButton('Make Payment', `${temp.payment_request.longurl}`)
