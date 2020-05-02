@@ -149,41 +149,41 @@ bot.action("TODAY", async ctx => {
   const date = new Date();
   const currenDay = date.toDateString().substring(0, 3);
 
-
+  
   if (currenDay == "Mon") {
    
-    await ctx.reply(
-      "Today's Menu\nNorth Indian : \n\nBreakfast : \nDosa with chutney & sambar\n\nLunch : \nWhite rice with moong dhaal curry,seasonal vegetable & paapad\n\nDinner : \nPoori with potato mash\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nDosa with chutney & sambar\n\nLunch : \nWhite rice with pachapayir sambar,seasonal vegetable & paapad\n\nDinner : \nPoori with potato mash"
+    await ctx.replyWithMarkdown(
+      "T O D A Y' S M E N U \n\n*NORTH INDIAN* \n\n_Breakfast_ \nDosa with chutney,vada & sambar\n\n_Lunch_ \nWhite rice with moong dhaal curry,seasonal vegetable & paapad\n\nDinner : \nPoori with potato mash\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nDosa with chutney,vada & sambar\n\n_Lunch_ \nWhite rice with pachapayir sambar,seasonal vegetable & paapad\n\n_Dinner_ \nPoori with potato mash"
     );
   }
   if (currenDay == "Tue") {
-    await ctx.reply(
-      "Today's Menu\nNorth Indian : \n\nBreakfast : \nPoori with potato mash\n\nLunch : \nWhite rice with toor dhaal tadka,seasonal vegetable & paapad\n\nDinner : \nPlain paratha with chole masala\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nPoori with potato mash\n\nLunch : \nWhite rice with sambar,seasonal vegetable & paapad\n\nDinner : \nMasala dosa with chutney "
+    await ctx.replyWithMarkdown(
+      "T O D A Y' S M E N U \n\n*NORTH INDIAN*  \n\n_Breakfast_ \nPoori with potato mash\n\n_Lunch_ \nWhite rice with toor dhaal tadka,seasonal vegetable & paapad\n\n_Dinner_ \nPlain paratha with chole masala\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nPoori with potato mash\n\n_Lunch_ \nWhite rice with sambar,seasonal vegetable & paapad\n\n_Dinner_ \nMasala dosa with chutney "
     );
   }
   if (currenDay == "Wed") {
-    await ctx.reply(
-      "Today's Menu\nNorth Indian : \n\nBreakfast : \nIdly with chutney and sambar\n\nLunch : \nWhite rice with rajma curry,seasonal vegetable & paapad\n\nDinner : \nPhulka with panner butter masala\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nIdly with chutney and sambar\n\nLunch : \nWhite rice with vathal kulambu,seasonal vegetable & paapad\n\nDinner : \nIdly with sambar"
+    await ctx.replyWithMarkdown(
+      "T O D A Y' S M E N U \n\n*NORTH INDIAN*  \n\n_Breakfast_ \nIdly with chutney,vada and sambar\n\n_Lunch_ \nWhite rice with rajma curry,seasonal vegetable & paapad\n\n_Dinner_ \nPhulka with panner butter masala\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nIdly with chutney and sambar\n\n_Lunch_ \nWhite rice with vathal kulambu,seasonal vegetable & paapad\n\n_Dinner_ \nIdly with sambar"
     );
   }
   if (currenDay == "Thu") {
-    await ctx.reply(
-      "Today's Menu\nNorth Indian : \n\nBreakfast : \nAloo paratha with curd & pickle\n\nLunch : \nWhite rice with khadi,seasonal vegetable & paapad\n\nDinner : \nChole batura\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nAloo paratha with curd & pickle\n\nLunch : \nWhite rice with more kolambu,seasonal vegetable & paapad\n\nDinner : \nchole batura"
+    await ctx.replyWithMarkdown(
+      "T O D A Y' S M E N U \n\n*NORTH INDIAN*  \n\n_Breakfast_ \nAloo paratha with curd & pickle\n\n_Lunch_ \nWhite rice with khadi,seasonal vegetable & paapad\n\n_Dinner_ \nChole batura\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nAloo paratha with curd & pickle\n\n_Lunch_ \nWhite rice with more kolambu,seasonal vegetable & paapad\n\n_Dinner_ \nchole batura"
     );
   }
   if (currenDay == "Fri") {
-    await ctx.reply(
-      "Today's Menu\nNorth Indian : \n\nBreakfast : \nMasala Dosa with chutney\n\nLunch : \nWhite rice with mysore dhaal tadka,seasonal vegetable & paapad\n\nDinner : \nAloo paratha with curd & pickle\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nMasala Dosa with chutney\n\nLunch : \nWhite rice with mysore dhaal curry,seasonal vegetable & paapad\n\nDinner : \nCumin rice with gravy"
+    await ctx.replyWithMarkdown(
+      "T O D A Y' S M E N U \n\n*NORTH INDIAN*  \n\n_Breakfast_ \nMasala Dosa with chutney\n\n_Lunch_ \nWhite rice with mysore dhaal tadka,seasonal vegetable & paapad\n\n_Dinner_ \nAloo paratha with curd & pickle\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nMasala Dosa with chutney\n\n_Lunch_ \nWhite rice with mysore dhaal curry,seasonal vegetable & paapad\n\n_Dinner_ \nCumin rice with gravy"
     );
   }
   if (currenDay == "Sat") {
-    await ctx.reply(
-      "Today's Menu\nNorth Indian : \n\nBreakfast : \nDhaalpoori\n\nLunch : \nWhite rice with channa dhaal,seasonal vegetable & paapad\n\nDinner : \nPlain paratha with matar paneer\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nDhaalpoori\n\nLunch : \nWhite rice with kadala curry,seasonal vegetable & paapad\n\nDinner : \nPuttu with kadala curry"
+    await ctx.replyWithMarkdown(
+      "T O D A Y' S M E N U \n\n*NORTH INDIAN*  \n\n_Breakfast_ \nDhaalpoori\n\n_Lunch_ \nWhite rice with channa dhaal,seasonal vegetable & paapad\n\n_Dinner_ \nPlain paratha with matar paneer\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nDhaalpoori\n\n_Lunch_ \nWhite rice with kadala curry,seasonal vegetable & paapad\n\n_Dinner_ \nPuttu with kadala curry"
     );
   }
   if (currenDay == "Sun") {
-    await ctx.reply(
-      "Today's Menu\nNorth Indian : \n\nBreakfast : \nSandwich with sauce sachet\n\nLunch : \nWhite rice with dhaal makhani,seasonal vegetable & paapad\n\nDinner : \nChapathi with chole masala\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nSandwich with sauce sachet\n\nLunch : \nWhite rice with dhaal makhani,seasonal vegetable & paapad\n\nDinner : \nChapathi with chole masala"
+    await ctx.replyWithMarkdown(
+      "T O D A Y' S M E N U \n\n*NORTH INDIAN*  \n\n_Breakfast_ \nSandwich with sauce sachet\n\n_Lunch_ \nWhite rice with dhaal makhani,seasonal vegetable & paapad\n\n_Dinner_ \nChapathi with chole masala\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nSandwich with sauce sachet\n\n_Lunch_ \nWhite rice with dhaal makhani,seasonal vegetable & paapad\n\n_Dinner_ \nChapathi with chole masala"
     );
   }
 });
@@ -196,49 +196,44 @@ bot.action("TOMORROW_MENU", async ctx => {
   
   if (tomorrowDay == "Mon") {
    
-    await ctx.reply(
-      "Tomorrow's Menu\nNorth Indian : \n\nBreakfast : \nDosa with chutney & sambar\n\nLunch : \nWhite rice with moong dhaal curry,seasonal vegetable & paapad\n\nDinner : \nPoori with potato mash\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nDosa with chutney & sambar\n\nLunch : \nWhite rice with pachapayir sambar,seasonal vegetable & paapad\n\nDinner : \nPoori with potato mash"
+    await ctx.replyWithMarkdown(
+      "T O M O R R O W' S M E N U\n\n*NORTH INDIAN*  \n\n_Breakfast_ \nDosa with chutney,vada & sambar\n\n_Lunch_ \nWhite rice with moong dhaal curry,seasonal vegetable & paapad\n\n_Dinner_ \nPoori with potato mash\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nDosa with chutney,vada & sambar\n\n_Lunch_ \nWhite rice with pachapayir sambar,seasonal vegetable & paapad\n\n_Dinner_ \nPoori with potato mash"
     );
   }
   if (tomorrowDay == "Tue") {
-    await ctx.reply(
-      "Tomorrow's Menu\nNorth Indian : \n\nBreakfast : \nPoori with potato mash\n\nLunch : \nWhite rice with toor dhaal tadka,seasonal vegetable & paapad\n\nDinner : \nPlain paratha with chole masala\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nPoori with potato mash\n\nLunch : \nWhite rice with sambar,seasonal vegetable & paapad\n\nDinner : \nMasala dosa with chutney "
+    await ctx.replyWithMarkdown(
+      "T O M O R R O W' S M E N U\n\n*NORTH INDIAN*  \n\n_Breakfast_ \nPoori with potato mash\n\n_Lunch_ \nWhite rice with toor dhaal tadka,seasonal vegetable & paapad\n\n_Dinner_ \nPlain paratha with chole masala\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nPoori with potato mash\n\n_Lunch_ \nWhite rice with sambar,seasonal vegetable & paapad\n\n_Dinner_ \nMasala dosa with chutney "
     );
   }
   if (tomorrowDay == "Wed") {
-    await ctx.reply(
-      "Tomorrow's Menu\nNorth Indian : \n\nBreakfast : \nIdly with chutney and sambar\n\nLunch : \nWhite rice with rajma curry,seasonal vegetable & paapad\n\nDinner : \nPhulka with panner butter masala\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nIdly with chutney and sambar\n\nLunch : \nWhite rice with vathal kulambu,seasonal vegetable & paapad\n\nDinner : \nIdly with sambar"
+    await ctx.replyWithMarkdown(
+      "T O M O R R O W' S M E N U\n\n*NORTH INDIAN*  \n\n_Breakfast_ \nIdly with chutney,vada and sambar\n\n_Lunch_ \nWhite rice with rajma curry,seasonal vegetable & paapad\n\n_Dinner_ \nPhulka with panner butter masala\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nIdly with chutney,vada and sambar\n\n_Lunch_ \nWhite rice with vathal kulambu,seasonal vegetable & paapad\n\n_Dinner_ \nIdly with sambar"
     );
   }
   if (tomorrowDay == "Thu") {
-    await ctx.reply(
-      "Tomorrow's Menu\nNorth Indian : \n\nBreakfast : \nAloo paratha with curd & pickle\n\nLunch : \nWhite rice with khadi,seasonal vegetable & paapad\n\nDinner : \nChole batura\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nAloo paratha with curd & pickle\n\nLunch : \nWhite rice with more kolambu,seasonal vegetable & paapad\n\nDinner : \nchole batura"
+    await ctx.replyWithMarkdown(
+      "T O M O R R O W' S M E N U\n\n*NORTH INDIAN*  \n\n_Breakfast_ \nAloo paratha with curd & pickle\n\n_Lunch_ \nWhite rice with khadi,seasonal vegetable & paapad\n\n_Dinner_ \nChole batura\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nAloo paratha with curd & pickle\n\n_Lunch_ \nWhite rice with more kolambu,seasonal vegetable & paapad\n\n_Dinner_ \nchole batura"
     );
   }
   if (tomorrowDay == "Fri") {
-    await ctx.reply(
-      "Tomorrow's Menu\nNorth Indian : \n\nBreakfast : \nMasala Dosa with chutney\n\nLunch : \nWhite rice with mysore dhaal tadka,seasonal vegetable & paapad\n\nDinner : \nAloo paratha with curd & pickle\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nMasala Dosa with chutney\n\nLunch : \nWhite rice with mysore dhaal curry,seasonal vegetable & paapad\n\nDinner : \nCumin rice with gravy"
+    await ctx.replyWithMarkdown(
+      "T O M O R R O W' S M E N U\n\n*NORTH INDIAN*  \n\n_Breakfast_ \nMasala Dosa with chutney\n\n_Lunch_ \nWhite rice with mysore dhaal tadka,seasonal vegetable & paapad\n\n_Dinner_ \nAloo paratha with curd & pickle\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nMasala Dosa with chutney\n\n_Lunch_ \nWhite rice with mysore dhaal curry,seasonal vegetable & paapad\n\n_Dinner_ \nCumin rice with gravy"
     );
   }
   if (tomorrowDay == "Sat") {
-    await ctx.reply(
-      "Tomorrow's Menu\nNorth Indian : \n\nBreakfast : \nDhaalpoori\n\nLunch : \nWhite rice with channa dhaal,seasonal vegetable & paapad\n\nDinner : \nPlain paratha with matar paneer\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nDhaalpoori\n\nLunch : \nWhite rice with kadala curry,seasonal vegetable & paapad\n\nDinner : \nPuttu with kadala curry"
+    await ctx.replyWithMarkdown(
+      "T O M O R R O W' S M E N U\n\n*NORTH INDIAN*  \n\n_Breakfast_ \nDhaalpoori\n\n_Lunch_ \nWhite rice with channa dhaal,seasonal vegetable & paapad\n\n_Dinner_ \nPlain paratha with matar paneer\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nDhaalpoori\n\n_Lunch_ \nWhite rice with kadala curry,seasonal vegetable & paapad\n\n_Dinner_ \nPuttu with kadala curry"
     );
   }
   if (tomorrowDay == "Sun") {
-    await ctx.reply(
-      "Tomorrow's Menu\nNorth Indian : \n\nBreakfast : \nSandwich with sauce sachet\n\nLunch : \nWhite rice with dhaal makhani,seasonal vegetable & paapad\n\nDinner : \nChapathi with chole masala\n---------------------------------------------------------\nSouth Indian: \n\nBreakfast : \nSandwich with sauce sachet\n\nLunch : \nWhite rice with dhaal makhani,seasonal vegetable & paapad\n\nDinner : \nChapathi with chole masala"
+    await ctx.replyWithMarkdown(
+      "T O M O R R O W' S M E N U\n\n*NORTH INDIAN*  \n\n_Breakfast_ \nSandwich with sauce sachet\n\n_Lunch_ \nWhite rice with dhaal makhani,seasonal vegetable & paapad\n\n_Dinner_ \nChapathi with chole masala\n---------------------------------------------------------\n*SOUTH INDIAN* \n\n_Breakfast_ \nSandwich with sauce sachet\n\n_Lunch_ \nWhite rice with dhaal makhani,seasonal vegetable & paapad\n\n_Dinner_ \nChapathi with chole masala"
     );
   }
 });
 
 
 
-// bot.telegram.setWebhook(`${URL}bot${BOT_TOKEN}`)
-
-// bot.startWebhook(`/bot${BOT_TOKEN}`, null, 5000)
-
-// bot.launch();
 
 
 bot.telegram.setWebhook(`${URL}bot${BOT_TOKEN}`);
