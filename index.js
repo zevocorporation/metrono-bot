@@ -109,10 +109,9 @@ bot.use(session());
 //Instruct bot to use stage middleware
 bot.use(stage.middleware());
 
-// Callback for inline register button .Enter into Regsiter scene
+
 bot.action("REGISTER_NOW", (ctx) => ctx.scene.enter("Register"));
 
-// Callback for order button .Enter into order scene
 bot.hears("Order Meals", (ctx) => ctx.scene.enter("OrderScene"));
 
 bot.hears("My Orders", (ctx) => ctx.scene.enter("ViewOrderScene"));
