@@ -6,6 +6,8 @@ const Keyboard = require("telegraf-keyboard"); //telegraf keyboard package
 const fetch = require("node-fetch"); // To send requests to graphql
 const Markup = require("telegraf/markup"); // For inline keyboard
 
+const helper = require("./helper");
+
 //import scenes
 const scene = require("./registration");
 const scene2 = require("./order");
@@ -27,65 +29,30 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 // ctx is context object.Holds many properties about curent chat
 // reply method to send message from bot
 
+const startKeyboard = new Keyboard();
+
+startKeyboard
+  .add("Wallet", "Menu")
+  .add("Subscribe Plans", "Order Meals", "Order Addons")
+  .add("My Plans", "My Account", "My Orders");
+
 bot.start(async (ctx) => {
-  //get current chat ID
-  const chatId = ctx.from.id;
+  user = await helper.verifyUser(ctx);
+  console.log(user);
 
-  // Query to check if user is already in database
-
-  const userExists = {
-    query: `
-        query
-        {
-          userexists(chatId:"${chatId}"){
-            name
-          }
-        }
-        `,
-  };
-
-  //Send request to graphql api about current user
-
-  await fetch("https://metrono-backend.herokuapp.com/graphql", {
-    method: "POST",
-    body: JSON.stringify(userExists),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((res) => {
-      if (res.status !== 200 && res.status !== 201) {
-        throw new Error("Failed!");
-      }
-      return res.json();
-    })
-    .then((response) => {
-      //If user is already in database . Show order Button
-      if (response.data.userexists !== null) {
-        const keyboard = new Keyboard();
-        keyboard
-          .add("Wallet", "Menu")
-          .add("Subscribe Plans", "Order Meals", "Order Addons")
-          .add("My Plans", "My Account", "My Orders");
-        ctx.reply(
-          "Hi " +
-            response.data.userexists.name +
-            "! .How can we help you order today?",
-          keyboard.draw()
-        );
-      }
-
-      // Else Prompt user to register and show inline register button
-      else {
-        ctx.reply(
-          "Lets get started ! Click the below button and match the follow ups!",
-          Markup.inlineKeyboard([
-            Markup.callbackButton("Register", "REGISTER_NOW"),
-          ]).extra()
-        );
-      }
-    })
-    .catch((err) => console.log(err));
+  if (!user) {
+    ctx.reply(
+      "Lets get started! Click below to register",
+      Markup.inlineKeyboard([
+        Markup.callbackButton("Register", "REGISTER_NOW"),
+      ]).extra()
+    );
+  } else {
+    ctx.reply(
+      "Hi ! " + user.name + ". How can we help you order today?",
+      startKeyboard.draw()
+    );
+  }
 });
 
 // Intialize stage object

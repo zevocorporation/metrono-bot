@@ -2,70 +2,35 @@ const WizardScene = require("telegraf/scenes/wizard");
 const Keyboard = require("telegraf-keyboard");
 const fetch = require("node-fetch");
 const Markup = require("telegraf/markup");
+const helper = require("./helper");
+const { backHome }= helper;
+
+const startKeyboard = new Keyboard();
+
+startKeyboard
+  .add("Wallet", "Menu")
+  .add("Subscribe Plans", "Order Meals", "Order Addons")
+  .add("My Plans", "My Account", "My Orders");
 
 const accountScene = new WizardScene(
   "AccountScene",
   async (ctx) => {
-    let notRegistered = false;
+    user = await helper.verifyUser(ctx);
 
-    const user = {
-      query: `
+    if (!user) {
+      ctx.reply(
+        "Sorry you have to register first!",
+        Markup.inlineKeyboard([
+          Markup.callbackButton("Register", "REGISTER_NOW"),
+        ]).extra()
+      );
 
-            query
-                {
-                userexists(chatId:"${ctx.from.id}")
-                {
-                    name
-                    mobile
-                    address
-                    email
-                }
-                
-                }
-            
-            
-            `,
-    };
-
-    await fetch("https://metrono-backend.herokuapp.com/graphql", {
-      method: "POST",
-      body: JSON.stringify(user),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Failed!");
-        }
-        return res.json();
-      })
-      .then((response) => {
-        console.log(response);
-        if (response.data.userexists) {
-          ctx.reply(
-            `Current Account details: \n Name : ${response.data.userexists.name} \n Mobile : ${response.data.userexists.mobile} \n Email : ${response.data.userexists.email} \n Address : ${response.data.userexists.address} `
-          );
-        } else {
-          ctx.reply(
-            "Sorry you have to register first!",
-            Markup.inlineKeyboard([
-              Markup.callbackButton("Register", "REGISTER_NOW"),
-            ]).extra()
-          );
-
-          notRegistered = true;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        ctx.reply("Something went Wrong! :(");
-        throw err;
-      });
-
-    if (notRegistered) {
       return ctx.scene.leave();
     }
+
+    ctx.reply(
+      `Current Account details: \n Name : ${user.name} \n Mobile : ${user.mobile} \n Email : ${user.email} \n Address : ${user.address} `
+    );
 
     const keyboard = new Keyboard();
     keyboard
@@ -77,27 +42,21 @@ const accountScene = new WizardScene(
 
     return ctx.wizard.next();
   },
-  (ctx) => {
+  async (ctx) => {
     if (
       ctx.message.text != "Change mobile number" &&
       ctx.message.text != "Change delivery address" &&
       ctx.message.text != "Change email" &&
       ctx.message.text != "Home"
     ) {
-      const keyboard = new Keyboard();
-      keyboard.add("Home");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.wizard.next();
+      ctx.reply("Sorry! unrecognised input. Try again", startKeyboard.draw());
+      return ctx.scene.leave();
     }
     if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
+      // ctx.reply("Choose an option!", startKeyboard.draw());
+      await backHome(ctx);
 
-      return ctx.scene.leave();
+      // return ctx.scene.leave();
     }
     if (ctx.message.text == "Change mobile number") {
       ctx.wizard.state.changeDetail = "mobile";
@@ -123,12 +82,7 @@ const accountScene = new WizardScene(
 
     if (changeDetail == "mobile") {
       if (changeData.length != 10) {
-        const keyboard = new Keyboard();
-        keyboard
-          .add("Wallet", "Menu")
-          .add("Subscribe Plans", "Order Meals", "Order Addons")
-          .add("My Plans", "My Account", "My Orders");
-        ctx.reply("Please Enter a valid Mobile number", keyboard.draw());
+        ctx.reply("Please Enter a valid Mobile number", startKeyboard.draw());
 
         return ctx.scene.leave();
       }
@@ -138,46 +92,26 @@ const accountScene = new WizardScene(
           (changeData[i] >= "a" && changeData[i] <= "z") ||
           (changeData[i] >= "A" && changeData[i] <= "Z")
         ) {
-          const keyboard = new Keyboard();
-          keyboard
-            .add("Wallet", "Menu")
-            .add("Subscribe Plans", "Order Meals", "Order Addons")
-            .add("My Plans", "My Account", "My Orders");
-          ctx.reply("Please Enter a valid Mobile number", keyboard.draw());
+          ctx.reply("Please Enter a valid Mobile number", startKeyboard.draw());
           return ctx.scene.leave();
         }
       }
     }
     if (changeDetail == "email") {
       if (!changeData.includes("@")) {
-        const keyboard = new Keyboard();
-        keyboard
-          .add("Wallet", "Menu")
-          .add("Subscribe Plans", "Order Meals", "Order Addons")
-          .add("My Plans", "My Account", "My Orders");
-        ctx.reply("Please Enter a valid Email", keyboard.draw());
+        ctx.reply("Please Enter a valid Email", startKeyboard.draw());
 
         return ctx.scene.leave();
       }
       if (!changeData.includes(".")) {
-        const keyboard = new Keyboard();
-        keyboard
-          .add("Wallet", "Menu")
-          .add("Subscribe Plans", "Order Meals", "Order Addons")
-          .add("My Plans", "My Account", "My Orders");
-        ctx.reply("Please Enter a valid Email");
+        ctx.reply("Please Enter a valid Email", startKeyboard.draw());
 
         return ctx.scene.leave();
       }
     }
 
     if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
+      ctx.reply("Choose an option!", startKeyboard.draw());
 
       return ctx.scene.leave();
     }
@@ -194,9 +128,6 @@ const accountScene = new WizardScene(
                   email
                 }
               }
-            
-            
-            
             `,
     };
 
@@ -215,13 +146,8 @@ const accountScene = new WizardScene(
       })
       .then((response) => {
         console.log(response);
-        const keyboard = new Keyboard();
-        keyboard
-          .add("Wallet", "Menu")
-          .add("Subscribe Plans", "Order Meals", "Order Addons")
-          .add("My Plans", "My Account", "My Orders");
 
-        ctx.reply("Your details are updated!", keyboard.draw());
+        ctx.reply("Your details are updated!", startKeyboard.draw());
       })
       .catch((err) => {
         console.log(err);
