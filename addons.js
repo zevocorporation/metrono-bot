@@ -2,202 +2,122 @@ const WizardScene = require("telegraf/scenes/wizard");
 const fetch = require("node-fetch");
 const Keyboard = require("telegraf-keyboard");
 const Markup = require("telegraf/markup");
+const helper = require("./helper");
+
+const { startKeyboard } = helper;
 
 const addonScene = new WizardScene(
   "AddonScene",
-  async ctx => {
-    let notRegistered = false;
+  async (ctx) => {
+    user = await helper.verifyUser(ctx);
 
-    const userExists = {
-      query: `
-          query
-          {
-            userexists(chatId:"${ctx.from.id}"){
-              name
-            }
-          }
-          `
-    };
-
-    //Send request to graphql api about current user
-
-    await fetch("https://metrono-backend.herokuapp.com/graphql", {
-      method: "POST",
-      body: JSON.stringify(userExists),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Failed!");
-        }
-        return res.json();
-      })
-      .then(response => {
-        //If user is already in database . Show order Button
-        if (!response.data.userexists) {
-          notRegistered = true;
-        }
-      })
-      .catch(err => console.log(err));
-
-    if (notRegistered) {
+    if (!user) {
       ctx.reply(
-        "Sorry you have to register first!",
+        "Sorry! you got to register first",
         Markup.inlineKeyboard([
-          Markup.callbackButton("Register", "REGISTER_NOW")
+          Markup.callbackButton("Register", "REGISTER_NOW"),
         ]).extra()
       );
 
       return ctx.scene.leave();
     }
 
+    ctx.wizard.state.user = user;
     const keyboard = new Keyboard();
     keyboard.add("Today", "Tomorrow").add("Home");
     ctx.reply("Select your day of order", keyboard.draw());
+
     return ctx.wizard.next();
   },
-  ctx => {
+  (ctx) => {
     if (
       ctx.message.text != "Today" &&
       ctx.message.text != "Tomorrow" &&
       ctx.message.text != "Home"
     ) {
-      const keyboard = new Keyboard();
-      keyboard.add("Home");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.wizard.next();
-    }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
+      ctx.reply("Sorry! unrecognised option. Try again", startKeyboard.draw());
       return ctx.scene.leave();
     }
 
     ctx.wizard.state.orderFor = ctx.message.text;
-    const timingKeys = new Keyboard();
 
+    // add zero in front of numbers < 10
     function checkTime(i) {
-      if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+      if (i < 10) {
+        i = "0" + i;
+      }
       return i;
     }
+
     const today = new Date();
     let h = today.getHours();
     let m = today.getMinutes();
     let s = today.getSeconds();
-    h=checkTime(h)
+    h = checkTime(h);
     m = checkTime(m);
     s = checkTime(s);
-    // const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    const time= h + ":" + m + ":" + s;
-    // console.log(time);
+
+    const time = h + ":" + m + ":" + s;
     const lunchTime = "10:30:00";
     const dinnerTime = "17:30:00";
 
-    if (ctx.message.text=="Today")
-    {
-      if (time<lunchTime)
-      {
-        timingKeys.add("Lunch","Dinner").add("Home")
-      }
-      else if (time > lunchTime && time <dinnerTime)
-      {
-        ctx.reply("Lunch orders are closed by 10:30 am")
-        timingKeys.add("Dinner").add("Home")
-      }
-      else if (time > lunchTime && time > dinnerTime)
-      {
-        
-        ctx.reply("Apologies! Today's Orders are closed. You can order for tommorrow");
-        return ;
+    const timingKeys = new Keyboard();
+
+    if (ctx.message.text == "Today") {
+      if (time < lunchTime) {
+        timingKeys.add("Lunch", "Dinner").add("Home");
+      } else if (time > lunchTime && time < dinnerTime) {
+        ctx.reply("Lunch orders are closed by 10:30 am");
+        timingKeys.add("Dinner").add("Home");
+      } else if (time > lunchTime && time > dinnerTime) {
+        ctx.reply(
+          "Apologies! Today's Orders are closed. You can order for tommorrow"
+        );
+        return;
       }
     }
 
-    if (ctx.message.text=="Tomorrow")
-    {
-      timingKeys.add("Breakfast","Lunch","Dinner").add("Home")
+    if (ctx.message.text == "Tomorrow") {
+      timingKeys.add("Breakfast", "Lunch", "Dinner").add("Home");
     }
 
-   
     ctx.reply("Choose your timing", timingKeys.draw());
     return ctx.wizard.next();
   },
 
-  ctx => {
+  (ctx) => {
     if (
       ctx.message.text != "Breakfast" &&
       ctx.message.text != "Lunch" &&
       ctx.message.text != "Dinner" &&
-      ctx.message.text != "Home" 
-     
+      ctx.message.text != "Home"
     ) {
-      const keyboard = new Keyboard();
-      keyboard.add("Home");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.wizard.next();
-    }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
+      ctx.reply("Sorry! unrecognised option. Try again", startKeyboard.draw());
       return ctx.scene.leave();
     }
 
-
-    ctx.wizard.state.orderType=ctx.message.text;
+    ctx.wizard.state.orderType = ctx.message.text;
     const keyboard = new Keyboard();
     keyboard
-      .add("Egg Masala 100 credits", "Chicken Gravy 200 Credits")
-      .add("Panner Tikka 150 Credits", "Panner Butter Masala 250 Credits")
+      .add("Chicken Gravy - 39 credits", "Single egg omlette - 10 credits")
+      .add("Double egg omlette - 18 credits", "Chicken fry - 39 credits")
       .add("Home");
     ctx.reply("Select an item from the menu!", keyboard.draw());
     return ctx.wizard.next();
-
-    
-
-
   },
 
-  ctx => {
-
+  (ctx) => {
     if (
-      ctx.message.text != "Egg Masala 100 credits" &&
-      ctx.message.text != "Chicken Gravy 200 Credits" &&
-      ctx.message.text != "Panner Tikka 150 Credits" &&
-      ctx.message.text != "Panner Butter Masala 250 Credits" &&
+      ctx.message.text != "Chicken Gravy - 39 credits" &&
+      ctx.message.text != "Single egg omlette - 10 credits" &&
+      ctx.message.text != "Double egg omlette - 18 credits" &&
+      ctx.message.text != "Chicken fry - 39 credits" &&
       ctx.message.text != "Home"
     ) {
-      const keyboard = new Keyboard();
-      keyboard.add("Home");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.wizard.next();
-    }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account","My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
+      ctx.reply("Sorry! unrecognised option. Try again", startKeyboard.draw());
       return ctx.scene.leave();
     }
-    
 
-   
     ctx.wizard.state.addons = ctx.message.text;
     const keyboard = new Keyboard();
     keyboard.add("1", "2", "3").add("Home");
@@ -205,193 +125,160 @@ const addonScene = new WizardScene(
     return ctx.wizard.next();
   },
 
-  ctx => {
+  async (ctx) => {
+    const addons = ctx.wizard.state.addons;
+    let addon;
+
     if (
       ctx.message.text != "1" &&
       ctx.message.text != "2" &&
       ctx.message.text != "3" &&
       ctx.message.text != "Home"
     ) {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account","My Orders");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.scene.leave();
-    }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account","My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
+      ctx.reply("Sorry! unrecognised option. Try again", startKeyboard.draw());
       return ctx.scene.leave();
     }
 
     ctx.wizard.state.size = ctx.message.text;
 
+    if (addons == "Chicken Gravy - 39 credits") {
+      addonCredit = 39;
+      addon = "Egg Masala";
+    }
+    if (addons == "Single egg omlette - 10 credits") {
+      addonCredit = 10;
+      addon = "Chicken Gravy";
+    }
+    if (addons == "Double egg omlette - 18 credits") {
+      addonCredit = 18;
+      addon = "Panner Tikka";
+    }
+    if (addons == "Chicken fry - 39 credits") {
+      addonCredit = 39;
+      addon = "Panner Butter Masala";
+    }
+
+    ctx.wizard.state.addon = addon;
+
+    addonCredit = addonCredit * parseInt(ctx.message.text);
+
+    let addDeliveryCost = false;
+    let date;
+
+    if (ctx.wizard.state.orderFor == "Today") {
+      const today = new Date();
+      date =
+        today.getFullYear() +
+        "-" +
+        (today.getMonth() + 1) +
+        "-" +
+        today.getDate();
+    }
+
+    if (ctx.wizard.state.orderFor == "Tomorrow") {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      date =
+        tomorrow.getFullYear() +
+        "-" +
+        (tomorrow.getMonth() + 1) +
+        "-" +
+        tomorrow.getDate();
+    }
+
+    const requestBody = {
+      query: `
+              query{
+                  addDeliveryCost(chatId:"${ctx.from.id}",orderType:"${ctx.wizard.state.orderType}",deliveryOn:"${date}")
+                  
+                }
+
+
+              `,
+    };
+
+    await fetch("https://metrono-backend.herokuapp.com/graphql", {
+      method: "POST",
+      body: JSON.stringify(requestBody),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error("Failed!");
+        }
+        return res.json();
+      })
+      .then((response) => {
+        addDeliveryCost = response.data.addDeliveryCost;
+      })
+      .catch((err) => {
+        throw err;
+      });
+
+    if (!addDeliveryCost) {
+      addonCredit = addonCredit + 10;
+      ctx.reply("You will be charged 10 credits for delivery");
+    } else {
+      ctx.reply(
+        "You won't be charged extra for delivery since you already have an order at that time"
+      );
+    }
+
+    ctx.wizard.state.addonCredit = addonCredit;
+
+    await ctx.reply(
+      "You have ordered " +
+        ctx.message.text +
+        " " +
+        ctx.wizard.state.addons +
+        " for " +
+        ctx.wizard.state.orderFor +
+        " " +
+        ctx.wizard.state.orderType
+    );
+    await ctx.reply(`Your order amount is ${addonCredit} credits `);
+
     const keyboard = new Keyboard();
     keyboard.add("Make Payment").add("Home");
-    ctx.reply("Continue or go back", keyboard.draw());
+    ctx.reply("Review order and Make your payment", keyboard.draw());
     return ctx.wizard.next();
   },
 
-  async ctx => {
+  async (ctx) => {
     if (ctx.message.text != "Make Payment" && ctx.message.text != "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account","My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
+      ctx.reply("Sorry! unrecognised option. Try again", startKeyboard.draw());
 
       return ctx.scene.leave();
     }
 
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account","My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
-      return ctx.scene.leave();
-    }
-
-    let userId;
-    let addon;
+    let addon = ctx.wizard.state.addon;
 
     const size = ctx.wizard.state.size;
     const orderFor = ctx.wizard.state.orderFor;
     const orderType = ctx.wizard.state.orderType;
-    const addons = ctx.wizard.state.addons;
-    let addonCredit;
-    let userCredit;
+    let addonCredit = ctx.wizard.state.addonCredit;
+    let user = ctx.wizard.state.user;
 
-    if (addons == "Egg Masala 100 credits") {
-      addonCredit = 100;
-      addon = "Egg Masala";
-    }
-    if (addons == "Chicken Gravy 200 Credits") {
-      addonCredit = 200;
-      addon = "Chicken Gravy";
-    }
-    if (addons == "Panner Tikka 150 Credits") {
-      addonCredit = 150;
-      addon = "Panner Tikka";
-    }
-    if (addons == "Panner Butter Masala 250 Credits") {
-      addonCredit = 250;
-      addon = "Panner Butter Masala";
-    }
-
-    addonCredit = addonCredit * parseInt(size);
-
-    // ctx.reply(`Total credit needed: ${addonCredit} to purchase`)
-    console.log(addonCredit);
-
-    const userIdQuery = {
-      query: `
-            query
-            {
-              userexists(chatId:"${ctx.from.id}"){
-                _id
-              }
-            }
-     `
-    };
-
-    await fetch("https://metrono-backend.herokuapp.com/graphql", {
-      method: "POST",
-      body: JSON.stringify(userIdQuery),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Failed!");
-        }
-        return res.json();
-      })
-      .then(response => {
-        if (response.data.userexists !== null) {
-          console.log(response);
-          userId = response.data.userexists._id;
-        } else {
-          ctx.reply(
-            "click the below button to register!",
-            Markup.inlineKeyboard([
-              Markup.callbackButton("Register", "REGISTER_NOW")
-            ]).extra()
-          );
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        throw err;
-      });
-
-    const getCredits = {
-      query: `
-
-                query
-                {
-                getCredits(chatId:"${ctx.from.id}")
-                
-                }
-            
-            
-            `
-    };
-
-    await fetch("https://metrono-backend.herokuapp.com/graphql", {
-      method: "POST",
-      body: JSON.stringify(getCredits),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Failed!");
-        }
-        return res.json();
-      })
-      .then(response => {
-        userCredit = response.data.getCredits;
-      })
-      .catch(err => {
-        console.log(err);
-        ctx.reply("Something went Wrong! :(");
-        throw err;
-      });
-
-    if (userCredit < addonCredit) {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account","My Orders");
-
+    if (user.credits < addonCredit) {
       ctx.reply(
-        `Not enough Credits to purchase! \n Credits needed : ${addonCredit} \n Your current credit balance is ${userCredit}  `,
-        keyboard.draw()
+        `Not enough Credits to purchase! \n Credits needed : ${addonCredit} \n Your current credit balance is ${user.credits}  `,
+        startKeyboard.draw()
       );
 
-        ctx.reply("Click below to recharge",
+      ctx.reply(
+        "Click below to recharge",
         Markup.inlineKeyboard([
-          Markup.callbackButton("Recharge Wallet", "RECHARGE_NOW")
-        ]).extra())
+          Markup.callbackButton("Recharge Wallet", "RECHARGE_NOW"),
+        ]).extra()
+      );
 
       return ctx.scene.leave();
     } else {
-      const updatedCredit = userCredit - addonCredit;
+      const updatedCredit = user.credits - addonCredit;
       const updateCredits = {
         query: `
                 mutation{
@@ -402,23 +289,23 @@ const addonScene = new WizardScene(
                   }
 
 
-                `
+                `,
       };
 
       await fetch("https://metrono-backend.herokuapp.com/graphql", {
         method: "POST",
         body: JSON.stringify(updateCredits),
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (res.status !== 200 && res.status !== 201) {
             throw new Error("Failed!");
           }
           return res.json();
         })
-        .then(async response => {
+        .then(async (response) => {
           console.log(response);
           const orderMutation = {
             query: `
@@ -437,7 +324,7 @@ const addonScene = new WizardScene(
                             paymentMode:"Credit",
                             paymentId:"Null",
                             paymentStatus:"Paid",
-                            orderedUser:"${userId}",
+                            orderedUser:"${user._id}",
                             chatId:"${ctx.from.id}",
                             addon:"${addon}"
                             
@@ -451,34 +338,29 @@ const addonScene = new WizardScene(
                             }
                             }
                         }
-                `
+                `,
           };
 
           await fetch("https://metrono-backend.herokuapp.com/graphql", {
             method: "POST",
             body: JSON.stringify(orderMutation),
             headers: {
-              "Content-Type": "application/json"
-            }
+              "Content-Type": "application/json",
+            },
           })
-            .then(res => {
+            .then((res) => {
               if (res.status !== 200 && res.status !== 201) {
                 throw new Error("Failed!");
               }
               return res.json();
             })
-            .then(response => {
-              const keyboard = new Keyboard();
-              keyboard
-                .add("Wallet", "Menu")
-                .add("Subscribe Plans", "Order Meals", "Order Addons")
-                .add("My Plans", "My Account");
-              ctx.reply("Purchase Successful!", keyboard.draw());
+            .then((response) => {
+              ctx.reply("Purchase Successful!", startKeyboard.draw());
               console.log(response);
             })
-            .catch(err => console.log(err));
+            .catch((err) => console.log(err));
         })
-        .catch(err => console.log(err));
+        .catch((err) => console.log(err));
     }
 
     return ctx.scene.leave();

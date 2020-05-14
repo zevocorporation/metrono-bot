@@ -48,23 +48,13 @@ exports.verifyUser = async function (ctx) {
   else return false;
 };
 
-exports.backHome = async (ctx) => {
+const startKeyboard = new Keyboard();
 
-
-  
-
-  const startKeyboard = new Keyboard();
-
-  startKeyboard
+startKeyboard
   .add("Wallet", "Menu")
   .add("Subscribe Plans", "Order Meals", "Order Addons")
   .add("My Plans", "My Account", "My Orders");
 
-  ctx.reply(
-    "Hi ! " + user.name + ". How can we help you order today?",
-    startKeyboard.draw()
-  );
+exports.startKeyboard = startKeyboard;
 
-  return ctx.scene.leave();
-
-}
+exports.connString = "https://metrono-backend.herokuapp.com/graphql";

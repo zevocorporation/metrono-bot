@@ -2,11 +2,11 @@
 const Telegraf = require("telegraf");
 const Stage = require("telegraf/stage"); // To build stages for scenes
 const session = require("telegraf/session"); // To create sessions
-const Keyboard = require("telegraf-keyboard"); //telegraf keyboard package
-const fetch = require("node-fetch"); // To send requests to graphql
 const Markup = require("telegraf/markup"); // For inline keyboard
 
+
 const helper = require("./helper");
+const { startKeyboard } = helper;
 
 //import scenes
 const scene = require("./registration");
@@ -29,12 +29,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 // ctx is context object.Holds many properties about curent chat
 // reply method to send message from bot
 
-const startKeyboard = new Keyboard();
 
-startKeyboard
-  .add("Wallet", "Menu")
-  .add("Subscribe Plans", "Order Meals", "Order Addons")
-  .add("My Plans", "My Account", "My Orders");
 
 bot.start(async (ctx) => {
   user = await helper.verifyUser(ctx);
@@ -53,6 +48,25 @@ bot.start(async (ctx) => {
       startKeyboard.draw()
     );
   }
+});
+
+stage.hears("Home", async (ctx) => {
+  user = await helper.verifyUser(ctx);
+
+  if (!user) {
+    ctx.reply(
+      "Lets get started! Click below to register",
+      Markup.inlineKeyboard([
+        Markup.callbackButton("Register", "REGISTER_NOW"),
+      ]).extra()
+    );
+  } else {
+    ctx.reply(
+      "Hi! " + user.name + ". How can we help you order today?",
+      startKeyboard.draw()
+    );
+  }
+  return ctx.scene.leave();
 });
 
 // Intialize stage object

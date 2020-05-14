@@ -17,7 +17,8 @@ const  registerScene= new WizardScene(
     "Register",
 
     ctx=> {
-        ctx.reply("Please do the honour of entering your name.");
+        
+        ctx.reply("Let's set foot on your personal details. \n Enter your name.");
         
         // To go to next function
         return ctx.wizard.next();
@@ -55,7 +56,7 @@ const  registerScene= new WizardScene(
 
        
         ctx.wizard.state.yourMobile=ctx.message.text;
-        ctx.reply("State your Email Id please");
+        ctx.reply("Enter your Email ID");
         return ctx.wizard.next();
 
     },
@@ -80,7 +81,7 @@ const  registerScene= new WizardScene(
         }
         
         ctx.wizard.state.yourEmail=ctx.message.text
-        ctx.reply("Final request to enter your delivery address");
+        ctx.reply("Enter your delivery address");
         return ctx.wizard.next();
     },
    async ctx=>{
@@ -167,7 +168,7 @@ const  registerScene= new WizardScene(
         keyboard.add('/start');
 
         //use draw method to display the keyboard
-        ctx.reply('Click below to go home',keyboard.draw());
+        ctx.reply("Welcome to metrono... It's time for you order some mouth watering food \n Click below to get started ",keyboard.draw());
 
         //Exit the scene
         return ctx.scene.leave();

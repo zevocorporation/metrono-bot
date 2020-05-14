@@ -3,282 +3,117 @@ const fetch = require("node-fetch");
 const Keyboard = require("telegraf-keyboard");
 const Markup = require("telegraf/markup");
 
-const myplanScene = new WizardScene(
-  "MyPlanScene",
-  async ctx => {
-    let notRegistered = false;
+const helper = require("./helper");
 
-    const userExists = {
-      query: `
-          query
-          {
-            userexists(chatId:"${ctx.from.id}"){
-              name
-            }
-          }
-          `
-    };
+const { startKeyboard } = helper;
 
-    //Send request to graphql api about current user
+const myplanScene = new WizardScene("MyPlanScene", async (ctx) => {
+  user = await helper.verifyUser(ctx);
 
-    await fetch("https://metrono-backend.herokuapp.com/graphql", {
-      method: "POST",
-      body: JSON.stringify(userExists),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Failed!");
-        }
-        return res.json();
-      })
-      .then(response => {
-        //If user is already in database . Show order Button
-        if (!response.data.userexists) {
-          notRegistered = true;
-        }
-      })
-      .catch(err => console.log(err));
+  if (!user) {
+    ctx.reply(
+      "Sorry! You got to register first!",
+      Markup.inlineKeyboard([
+        Markup.callbackButton("Register", "REGISTER_NOW"),
+      ]).extra()
+    );
 
-    if (notRegistered) {
-      ctx.reply(
-        "Sorry you have to register first!",
-        Markup.inlineKeyboard([
-          Markup.callbackButton("Register", "REGISTER_NOW")
-        ]).extra()
-      );
+    return ctx.scene.leave();
+  }
 
-      return ctx.scene.leave();
-    }
+  let subscriptions;
 
-    let planActive = false;
-
-    ctx.reply("Current plan details:");
-
-    const plan = {
-      query: `
+  const plan = {
+    query: `
             query{
                 getPlanDetails(chatId:"${ctx.from.id}")
                 {
                   plan
                   cuisine
                   createdAt
+                  mealType
                   
                 }
               }
               
-            `
-    };
+            `,
+  };
 
-    await fetch("https://metrono-backend.herokuapp.com/graphql", {
-      method: "POST",
-      body: JSON.stringify(plan),
-      headers: {
-        "Content-Type": "application/json"
+  await fetch("https://metrono-backend.herokuapp.com/graphql", {
+    method: "POST",
+    body: JSON.stringify(plan),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => {
+      if (res.status !== 200 && res.status !== 201) {
+        throw new Error("Failed!");
       }
+      return res.json();
     })
-      .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Failed!");
-        }
-        return res.json();
-      })
-      .then(async response => {
-        console.log(response);
+    .then(async (response) => {
+      subscriptions = response.data.getPlanDetails;
+    })
+    .catch((err) => {
+      throw err;
+    });
 
-        if (response.data.getPlanDetails) {
-          const today = new Date();
-          const plandate = new Date(response.data.getPlanDetails.createdAt);
-          validity = Math.floor(
-            (today.getTime() - plandate.getTime()) / (1000 * 3600 * 24)
-          );
+  if (subscriptions.length == 0) {
+    ctx.reply(
+      "You aren't subscribed to any of our plans",
+      startKeyboard.draw()
+    );
+    ctx.reply(
+      "Click below to get onboard!",
+      Markup.inlineKeyboard([
+        Markup.callbackButton("Subscribe", "SUBSCRIBE_NOW"),
+      ]).extra()
+    );
 
-          await ctx.reply(
-            "Your  plan " +
-              response.data.getPlanDetails.plan +
-              "\n Cuisine : " +
-              response.data.getPlanDetails.cuisine +
-              " \n Subscribed on :" +
-              response.data.getPlanDetails.createdAt
-          );
-          if (response.data.getPlanDetails.plan == "7 day plan") {
-            if (7 - validity > 0) {
-              ctx.reply(`Your plan validity is ${7 - validity} days`);
-              const keyboard = new Keyboard();
-              keyboard.add("Change cuisine").add("Home");
-              ctx.reply(
-                "Click below button to change cuisine",
-                keyboard.draw()
-              );
-              planActive = true;
-            } else {
-              const keyboard = new Keyboard();
-              keyboard
-                .add("Wallet", "Menu")
-                .add("Subscribe Plans", "Order Meals", "Order Addons")
-                .add("My Plans", "My Account", "My Orders");
+    return ctx.scene.leave();
+  }
 
-              ctx.reply(
-                `Your plan has expired `,
-                keyboard.draw()
-              );
+  ctx.reply("Subscribed Plans");
+  for (i = 0; i < subscriptions.length; i++) {
+    const today = new Date();
+    const plandate = new Date(subscriptions[i].createdAt);
+    dayDifference = Math.floor(
+      (today.getTime() - plandate.getTime()) / (1000 * 3600 * 24)
+    );
 
-              ctx.reply("Click below Subscribe again", Markup.inlineKeyboard([
-                Markup.callbackButton("Subscribe", "SUBSCRIBE_NOW")
-              ]).extra())
-            }
-          } else if (response.data.getPlanDetails.plan == "28 day plan") {
-            if (28 - validity > 0) {
-              ctx.reply(`Your plan validity is ${28 - validity} days`);
-              const keyboard = new Keyboard();
-              keyboard.add("Change cuisine").add("Home");
-              ctx.reply(
-                "Click below button to change cuisine",
-                keyboard.draw()
-              );
-              planActive = true;
-            } else {
-              const keyboard = new Keyboard();
-              keyboard
-                .add("Wallet", "Menu")
-                .add("Subscribe Plans", "Order Meals", "Order Addons")
-                .add("My Plans", "My Account", "My Orders");
+    console.log(dayDifference);
 
-              ctx.reply(
-                `Your plan has expired `,
-                keyboard.draw()
-              );
+    let validity;
 
-              ctx.reply("Click below Subscribe again", Markup.inlineKeyboard([
-                Markup.callbackButton("Subscribe", "SUBSCRIBE_NOW")
-              ]).extra())
-              
-            }
-          }
-        } else {
-          const keyboard = new Keyboard();
-          keyboard
-            .add("Wallet", "Menu")
-            .add("Subscribe Plans", "Order Meals", "Order Addons")
-            .add("My Plans", "My Account", "My Orders");
+    if (subscriptions[i].plan == "7 day plan") validity = 7 - dayDifference;
+    if (subscriptions[i].plan == "28 day plan") validity = 28 - dayDifference;
 
-          ctx.reply("You are not subscribed to any plan!", keyboard.draw());
-          ctx.reply("Click below to subscribe",
-          Markup.inlineKeyboard([
-            Markup.callbackButton("Subscribe", "SUBSCRIBE_NOW")
-          ]).extra());
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        throw err;
-      });
-
-    if (planActive) {
-      return ctx.wizard.next();
+    if (validity <= 0) {
+      await ctx.reply(
+        "Your " +
+          subscriptions[i].cuisine +
+          " " +
+          subscriptions[i].mealType +
+          " subscription will expire has expired",
+        Markup.inlineKeyboard([
+          Markup.callbackButton("Subscribe", "SUBSCRIBE_NOW"),
+        ]).extra()
+      );
     } else {
-      return ctx.scene.leave();
-    }
-  },
-  ctx => {
-    if (ctx.message.text != "Change cuisine" && ctx.message.text != "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.scene.leave();
-    }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
-      return ctx.scene.leave();
-    } else {
-      const keyboard = new Keyboard();
-      keyboard.add("South Indian", "North Indian").add("Home");
-      ctx.reply("choose a cuisine!", keyboard.draw());
-      return ctx.wizard.next();
-    }
-  },
-  async ctx => {
-    if (
-      ctx.message.text != "South Indian" &&
-      ctx.message.text != "North Indian" &&
-      ctx.message.text != "Home"
-    ) {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.scene.leave();
-    }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
-      return ctx.scene.leave();
-    } else {
-      const cuisine = ctx.message.text;
-      const changeCuisine = {
-        query: `
-                mutation{
-                    changeCuisine(chatId:"${ctx.from.id}",cuisine:"${cuisine}")
-                    {
-                      cuisine
-                    }
-                  }
-                
-                `
-      };
-
-      await fetch("https://metrono-backend.herokuapp.com/graphql", {
-        method: "POST",
-        body: JSON.stringify(changeCuisine),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-        .then(res => {
-          if (res.status !== 200 && res.status !== 201) {
-            throw new Error("Failed!");
-          }
-          return res.json();
-        })
-        .then(response => {
-          const keyboard = new Keyboard();
-          keyboard
-            .add("Wallet", "Menu")
-            .add("Subscribe Plans", "Order Meals", "Order Addons")
-            .add("My Plans", "My Account", "My Orders");
-          ctx.reply(
-            `Cuisine Changed \n Current Cusine: ${response.data.changeCuisine.cuisine}`,
-            keyboard.draw()
-          );
-        })
-        .catch(err => {
-          console.log(err);
-          throw err;
-        });
-
-      return ctx.scene.leave();
+      await ctx.reply(
+        "Your " +
+          subscriptions[i].cuisine +
+          " " +
+          subscriptions[i].mealType +
+          " subscription will expire in " +
+          validity +
+          " days"
+      );
     }
   }
-);
+
+  return ctx.scene.leave();
+});
 
 exports.myplanScene = myplanScene;

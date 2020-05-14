@@ -1,84 +1,41 @@
 const WizardScene = require("telegraf/scenes/wizard");
 const fetch = require("node-fetch");
 const Keyboard = require("telegraf-keyboard");
-const request = require("request");
 const Markup = require("telegraf/markup");
+
+const helper = require("./helper");
+
+const { startKeyboard } = helper;
 
 const orderScene = new WizardScene(
   "OrderScene",
-  async ctx => {
-    let notRegistered = false;
+  async (ctx) => {
+    user = await helper.verifyUser(ctx);
 
-    const userExists = {
-      query: `
-          query
-          {
-            userexists(chatId:"${ctx.from.id}"){
-              name
-            }
-          }
-          `
-    };
-
-    //Send request to graphql api about current user
-
-    await fetch("https://metrono-backend.herokuapp.com/graphql", {
-      method: "POST",
-      body: JSON.stringify(userExists),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Failed!");
-        }
-        return res.json();
-      })
-      .then(response => {
-        //If user is already in database . Show order Button
-        if (!response.data.userexists) {
-          notRegistered = true;
-        }
-      })
-      .catch(err => console.log(err));
-
-    if (notRegistered) {
+    if (!user) {
       ctx.reply(
-        "Sorry you have to register first!",
+        "Sorry! you got to register first",
         Markup.inlineKeyboard([
-          Markup.callbackButton("Register", "REGISTER_NOW")
+          Markup.callbackButton("Register", "REGISTER_NOW"),
         ]).extra()
       );
 
       return ctx.scene.leave();
     }
 
+    ctx.wizard.state.user = user;
     const keyboard = new Keyboard();
     keyboard.add("Today", "Tomorrow").add("Home");
     ctx.reply("Select your day of order", keyboard.draw());
     return ctx.wizard.next();
   },
-  ctx => {
+  (ctx) => {
     if (
       ctx.message.text != "Today" &&
       ctx.message.text != "Tomorrow" &&
       ctx.message.text != "Home"
     ) {
-      const keyboard = new Keyboard();
-      keyboard.add("Home");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.wizard.next();
-    }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
+      ctx.reply("Sorry, unrecognised input. Try again ", startKeyboard.draw());
       return ctx.scene.leave();
     }
 
@@ -86,145 +43,90 @@ const orderScene = new WizardScene(
     const timingKeys = new Keyboard();
 
     function checkTime(i) {
-      if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+      if (i < 10) {
+        i = "0" + i;
+      } // add zero in front of numbers < 10
       return i;
     }
     const today = new Date();
     let h = today.getHours();
     let m = today.getMinutes();
     let s = today.getSeconds();
-    h=checkTime(h)
+    h = checkTime(h);
     m = checkTime(m);
     s = checkTime(s);
-    // const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    const time= h + ":" + m + ":" + s;
-    console.log(time);
+
+    const time = h + ":" + m + ":" + s;
+
     const lunchTime = "10:30:00";
     const dinnerTime = "17:30:00";
 
-    if (ctx.message.text=="Today")
-    {
-      if (time<lunchTime)
-      {
-        timingKeys.add("Lunch","Dinner").add("Home")
-      }
-      else if (time > lunchTime && time <dinnerTime)
-      {
-        ctx.reply("Lunch orders are closed by 10:30 am")
-        timingKeys.add("Dinner").add("Home")
-      }
-      else if (time > lunchTime && time > dinnerTime)
-      {
-        
-        ctx.reply("Apologies! Today's Orders are closed. You can order for tommorrow");
-        return ;
+    if (ctx.message.text == "Today") {
+      if (time < lunchTime) {
+        timingKeys.add("Lunch", "Dinner").add("Home");
+      } else if (time > lunchTime && time < dinnerTime) {
+        ctx.reply("Lunch orders are closed by 10:30 am");
+        timingKeys.add("Dinner").add("Home");
+      } else if (time > lunchTime && time > dinnerTime) {
+        ctx.reply(
+          "Apologies! Today's Orders are closed. You can order for tommorrow"
+        );
+        return;
       }
     }
 
-    if (ctx.message.text=="Tomorrow")
-    {
-      timingKeys.add("Breakfast","Lunch","Dinner").add("Home")
+    if (ctx.message.text == "Tomorrow") {
+      timingKeys.add("Breakfast", "Lunch", "Dinner").add("Home");
     }
 
-   
     ctx.reply("Choose your timing", timingKeys.draw());
     return ctx.wizard.next();
   },
-  ctx => {
+  (ctx) => {
     if (
       ctx.message.text != "Breakfast" &&
       ctx.message.text != "Lunch" &&
       ctx.message.text != "Dinner" &&
-      ctx.message.text != "Home" 
-     
+      ctx.message.text != "Home"
     ) {
-      const keyboard = new Keyboard();
-      keyboard.add("Home");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.wizard.next();
-    }
-
-    // if (ctx.message.text=="Tomorrow")
-    // {
-    //   return;
-    // }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
+      ctx.reply("Sorry, unrecognised input. Try again ", startKeyboard.draw());
       return ctx.scene.leave();
     }
 
-    ctx.wizard.state.orderType=ctx.message.text;
+    ctx.wizard.state.orderType = ctx.message.text;
 
-    const keyboard= new Keyboard()
-    keyboard.add("North Indian","South Indian").add("Home")
-    ctx.reply("Choose your cuisine",keyboard.draw())
+    const keyboard = new Keyboard();
+    keyboard.add("North Indian", "South Indian").add("Home");
+    ctx.reply("Choose your cuisine", keyboard.draw());
     return ctx.wizard.next();
-
-  
   },
 
-  ctx => {
-
+  (ctx) => {
     if (
       ctx.message.text != "North Indian" &&
       ctx.message.text != "South Indian" &&
-      
-      ctx.message.text != "Home" 
-     
+      ctx.message.text != "Home"
     ) {
-      const keyboard = new Keyboard();
-      keyboard.add("Home");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.wizard.next();
-    }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
+      ctx.reply("Sorry, unrecognised input. Try again ", startKeyboard.draw());
       return ctx.scene.leave();
     }
 
-    ctx.wizard.state.cuisine=ctx.message.text;
-   
+    ctx.wizard.state.cuisine = ctx.message.text;
+
     const keyboard = new Keyboard();
     keyboard.add("Regular", "Medium", "Jumbo").add("Home");
     ctx.reply("Choose your order size", keyboard.draw());
     return ctx.wizard.next();
   },
 
-  ctx => {
+  (ctx) => {
     if (
       ctx.message.text != "Regular" &&
       ctx.message.text != "Medium" &&
       ctx.message.text != "Jumbo" &&
       ctx.message.text != "Home"
     ) {
-      const keyboard = new Keyboard();
-      keyboard.add("Home");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
-      return ctx.wizard.next();
-    }
-
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
-
+      ctx.reply("Sorry, unrecognised input. Try again ", startKeyboard.draw());
       return ctx.scene.leave();
     }
 
@@ -234,7 +136,9 @@ const orderScene = new WizardScene(
     ctx.reply("What quantity would you prefer?", keyboard.draw());
     return ctx.wizard.next();
   },
-  async ctx => {
+  async (ctx) => {
+    let credits;
+
     if (
       ctx.message.text != "1" &&
       ctx.message.text != "2" &&
@@ -243,275 +147,231 @@ const orderScene = new WizardScene(
       ctx.message.text != "5" &&
       ctx.message.text != "Home"
     ) {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Please Choose from given options!", keyboard.draw());
+      ctx.reply("Sorry, unrecognised input. Try again ", startKeyboard.draw());
       return ctx.scene.leave();
     }
 
-    if (ctx.message.text == "Home") {
-      const keyboard = new Keyboard();
-      keyboard
-        .add("Wallet", "Menu")
-        .add("Subscribe Plans", "Order Meals", "Order Addons")
-        .add("My Plans", "My Account", "My Orders");
-      ctx.reply("Choose an option!", keyboard.draw());
+    ctx.wizard.state.quantity = ctx.message.text;
 
-      return ctx.scene.leave();
+    if (ctx.wizard.state.size == "Regular") {
+      if (ctx.wizard.state.orderType == "Breakfast") credits = 44;
+      if (ctx.wizard.state.orderType == "Lunch") credits = 54;
+      if (ctx.wizard.state.orderType == "Dinner") credits = 54;
+    } else if (ctx.wizard.state.size == "Medium") {
+      if (ctx.wizard.state.orderType == "Breakfast") credits = 49;
+      if (ctx.wizard.state.orderType == "Lunch") credits = 59;
+      if (ctx.wizard.state.orderType == "Dinner") credits = 59;
+    } else if (ctx.wizard.state.size == "Jumbo") {
+      if (ctx.wizard.state.orderType == "Breakfast") credits = 59;
+      if (ctx.wizard.state.orderType == "Lunch") credits = 69;
+      if (ctx.wizard.state.orderType == "Dinner") credits = 69;
     }
 
-    var count = 0;
+    credits = credits * parseInt(ctx.message.text);
 
-    let amount;
-    const quantity = ctx.message.text;
-    const orderFor = ctx.wizard.state.orderFor;
-    const size = ctx.wizard.state.size;
-    const orderType = ctx.wizard.state.orderType;
-    const cuisine = ctx.wizard.state.cuisine;
-    if (size == "Regular") amount = 10;
-    else if (size == "Medium") amount = 100;
-    else if (size == "Jumbo") amount = 120;
+    let addDeliveryCost = false;
+    let date;
 
-    amount = amount * parseInt(quantity);
+    if (ctx.wizard.state.orderFor == "Today") {
+      const today = new Date();
+      date =
+        today.getFullYear() +
+        "-" +
+        (today.getMonth() + 1) +
+        "-" +
+        today.getDate();
+    }
 
-    //set up headers for instamojo gateway
-    var headers = {
-      "X-Api-Key": "test_6bbdadf8c5089bf688f35b327b6",
-      "X-Auth-Token": "test_b1526e3b6dd4a4863398f9b85ce"
-    };
+    if (ctx.wizard.state.orderFor == "Tomorrow") {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
 
-    //payload holds information about transaction
-    var payload = {
-      // required fields
-      amount: `${amount}`,
-      purpose: "metrono"
-    };
+      date =
+        tomorrow.getFullYear() +
+        "-" +
+        (tomorrow.getMonth() + 1) +
+        "-" +
+        tomorrow.getDate();
+    }
 
-    console.log(orderFor + " " + quantity + " " + size + " " + amount);
-
-    //Check if user is in database
-    const userIdQuery = {
+    const requestBody = {
       query: `
-            query
-            {
-              userexists(chatId:"${ctx.from.id}"){
-                _id
-              }
-            }
-     `
+              query{
+                  addDeliveryCost(chatId:"${ctx.from.id}",orderType:"${ctx.wizard.state.orderType}",deliveryOn:"${date}")
+                  
+                }
+
+
+              `,
     };
 
     await fetch("https://metrono-backend.herokuapp.com/graphql", {
       method: "POST",
-      body: JSON.stringify(userIdQuery),
+      body: JSON.stringify(requestBody),
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     })
-      .then(res => {
+      .then((res) => {
         if (res.status !== 200 && res.status !== 201) {
           throw new Error("Failed!");
         }
         return res.json();
       })
-      .then(response => {
-        if (response.data.userexists !== null) {
-          console.log(response);
-          ctx.wizard.state.userId = response.data.userexists._id;
-        } else {
-          ctx.reply(
-            "click the below button to register!",
-            Markup.inlineKeyboard([
-              Markup.callbackButton("Register", "REGISTER_NOW")
-            ]).extra()
-          );
-        }
+      .then((response) => {
+        addDeliveryCost = response.data.addDeliveryCost;
       })
-      .catch(err => {
-        console.log(err);
+      .catch((err) => {
         throw err;
       });
 
-    //Promise object to create an payment request and place an order
-
-    var promise = new Promise(function(resolve, reject) {
-      request.post(
-        "https://test.instamojo.com/api/1.1/payment-requests/",
-        { form: payload, headers: headers },
-        function(error, response, body) {
-          if (!error && response.statusCode == 201) {
-            const temp = JSON.parse(body);
-            // console.log("this"+temp.payment_request.id)
-            ctx.wizard.state.paymentId = temp.payment_request.id;
-            console.log(response.statusCode);
-            const keyboard = new Keyboard();
-            keyboard.add("/start");
-
-            // ctx.reply(temp.payment_request.longurl)
-            ctx.reply("You use this test card for payment \n Card no: 4242 4242 4242 4242 \n Exp date: 04/21 \n cvv: 111 \n juspay code: 1221 ")
-            ctx.reply(`The amount of your order is ${amount}`, keyboard.draw());
-            ctx.reply(
-              `Complete your payment! or Go back!`,
-              Markup.inlineKeyboard([
-                Markup.urlButton(
-                  "Make Payment",
-                  `${temp.payment_request.longurl}`
-                )
-              ]).extra()
-            );
-
-            console.log(body);
-
-            const orderMutation = {
-              query: `
-                                mutation
-                                    {
-                                    createOrder(orderInput:
-                                    {
-                                        cuisine:"${cuisine}",
-                                        orderFor:"${orderFor}",
-                                        
-                                        orderType:"${orderType}",
-                                        size:"${size + "-" + quantity}",
-                                        orderStatus:"processing",
-                                        deliveryStatus:"Packed",
-                                        deliveryPartner:"Not assigned",
-                                        paymentMode:"online",
-                                        paymentId:"${temp.payment_request.id}",
-                                        paymentStatus:"null",
-                                        orderedUser:"${
-                                          ctx.wizard.state.userId
-                                        }",
-                                        chatId:"${ctx.from.id}",
-                                        addon:"Not applicable"
-                                        
-                                    })
-                                        {
-                                        _id
-                                    
-                                        orderedUser
-                                        {
-                                            _id
-                                        }
-                                        }
-                                    }
-                        `
-            };
-
-            fetch("https://metrono-backend.herokuapp.com/graphql", {
-              method: "POST",
-              body: JSON.stringify(orderMutation),
-              headers: {
-                "Content-Type": "application/json"
-              }
-            })
-              .then(res => {
-                if (res.status !== 200 && res.status !== 201) {
-                  throw new Error("Failed!");
-                }
-                return res.json();
-              })
-              .then(response => {
-                console.log(response);
-              })
-              .catch(err => console.log(err));
-
-            resolve(temp.payment_request.id);
-          }
-        }
+    if (!addDeliveryCost) {
+      credits = credits + 10;
+      ctx.reply("You will be charged 10 credits for delivery");
+    } else {
+      ctx.reply(
+        "You won't be charged extra for delivery since you already have an order at that time"
       );
-    });
+    }
 
-    // to check and update payment Status
-    await promise
-      .then(function(res) {
-        var interval = setInterval(function testOne() {
-          count = count + 1;
+    ctx.wizard.state.credits = credits;
 
-          request.get(
-            `https://test.instamojo.com/api/1.1/payment-requests/${res}/`,
-            { headers: headers },
-            function(error, response, body) {
-              // console.log(response.statusCode);
-              if (!error && response.statusCode == 200) {
-                // console.log(response.statusCode);
-                // console.log(body);
+    const keyboard = new Keyboard();
+    await ctx.reply(
+      "You have ordered " +
+        ctx.wizard.state.size +
+        "-" +
+        ctx.message.text +
+        " " +
+        ctx.wizard.state.cuisine +
+        " " +
+        ctx.wizard.state.orderType +
+        " for " +
+        ctx.wizard.state.orderFor
+    );
 
-                const temp = JSON.parse(body);
+    await ctx.reply(`Your order amount is ${credits} credits `);
 
-                if (temp.payment_request.status == "Completed") {
-                  if (temp.payment_request.payments[0].status == "Credit") {
-                    const updatePaymentStatus = {
-                      query: `
-                                            mutation
-                                                {
-                                                updatePaymentStatus(paymentId:"${res}"){
-                                                    _id
-                                                }
-                                                }
+    keyboard.add("Make Payment").add("Home");
+    ctx.reply("Review order and make payment", keyboard.draw());
+    return ctx.wizard.next();
+  },
 
+  async (ctx) => {
+    if (ctx.message.text != "Make Payment" && ctx.message.text != "Home") {
+      ctx.reply("Sorry! unrecognised option. Try again", startKeyboard.draw());
 
-                                            `
-                    };
+      return ctx.scene.leave();
+    }
 
-                    fetch("https://metrono-backend.herokuapp.com/graphql", {
-                      method: "POST",
-                      body: JSON.stringify(updatePaymentStatus),
-                      headers: {
-                        "Content-Type": "application/json"
-                      }
-                    })
-                      .then(res => {
-                        if (res.status !== 200 && res.status !== 201) {
-                          throw new Error("Failed!");
-                        }
-                        return res.json();
-                      })
-                      .then(response => {
-                        console.log(response);
-                        const keyboard = new Keyboard();
-                        keyboard
-                          .add("Wallet", "Menu")
-                          .add("Subscribe Plans", "Order Meals", "Order Addons")
-                          .add("My Plans", "My Account", "My Orders");
-                        ctx.reply("Order Successful!", keyboard.draw());
-                      })
-                      .catch(err => console.log(err));
+    let credits = ctx.wizard.state.credits;
+    const quantity = ctx.wizard.state.quantity;
+    const orderFor = ctx.wizard.state.orderFor;
+    const size = ctx.wizard.state.size;
+    const orderType = ctx.wizard.state.orderType;
+    const cuisine = ctx.wizard.state.cuisine;
+    const user = ctx.wizard.state.user;
 
-                    clearInterval(interval);
-                  } else {
-                    console.log("Order failed");
-                    clearInterval(interval);
+    if (user.credits < credits) {
+      ctx.reply(
+        `Not enough Credits to purchase! \n Credits needed : ${credits} \n Your current credit balance is ${user.credits}  `,
+        startKeyboard.draw()
+      );
+
+      ctx.reply(
+        "Click below to recharge",
+        Markup.inlineKeyboard([
+          Markup.callbackButton("Recharge Wallet", "RECHARGE_NOW"),
+        ]).extra()
+      );
+
+      return ctx.scene.leave();
+    } else {
+      const updatedCredit = user.credits - credits;
+      const setCredits = {
+        query: `
+                mutation{
+                    setCredits(chatId:"${ctx.from.id}",credit:${updatedCredit})
+                    {
+                      _id
+                    }
                   }
-                }
 
-                console.log("pending");
-              }
-            }
-          );
 
-          if (count > 120) {
-            request.post(
-              `https://test.instamojo.com/api/1.1/payment-requests/${res}/disable/`,
-              { form: payload, headers: headers },
-              function(error, response, body) {
-                console.log(response.statusCode);
-                if (!error && response.statusCode == 201) {
-                  console.log(response.statusCode);
-                }
-              }
-            );
-            // ctx.reply("Session Expired try again");
-            clearInterval(interval);
-          }
-        }, 3000);
+                `,
+      };
+
+      await fetch("https://metrono-backend.herokuapp.com/graphql", {
+        method: "POST",
+        body: JSON.stringify(setCredits),
+        headers: {
+          "Content-Type": "application/json",
+        },
       })
-      .catch(function() {
-        console.log("Some error has occured");
-      });
+        .then((res) => {
+          if (res.status !== 200 && res.status !== 201) {
+            throw new Error("Failed!");
+          }
+          return res.json();
+        })
+        .then(async (response) => {
+          console.log(response);
+          const orderMutation = {
+            query: `
+                    mutation
+                        {
+                        createOrder(orderInput:
+                        {
+                            cuisine:"${cuisine}",
+                            orderFor:"${orderFor}",
+                            
+                            orderType:"${orderType}",
+                            size:"${size}",
+                            orderStatus:"Processing",
+                            deliveryStatus:"Packed",
+                            deliveryPartner:"Not assigned",
+                            paymentMode:"Credit",
+                            paymentId:"Null",
+                            paymentStatus:"Paid",
+                            orderedUser:"${user._id}",
+                            chatId:"${ctx.from.id}",
+                            addon:"Not applicable"
+                            
+                        })
+                            {
+                            _id
+                        
+                            orderedUser
+                            {
+                                _id
+                            }
+                            }
+                        }
+                `,
+          };
+
+          await fetch("https://metrono-backend.herokuapp.com/graphql", {
+            method: "POST",
+            body: JSON.stringify(orderMutation),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => {
+              if (res.status !== 200 && res.status !== 201) {
+                throw new Error("Failed!");
+              }
+              return res.json();
+            })
+            .then((response) => {
+              ctx.reply("Purchase Successful!", startKeyboard.draw());
+              console.log(response);
+            })
+            .catch((err) => console.log(err));
+        })
+        .catch((err) => console.log(err));
+    }
 
     return ctx.scene.leave();
   }

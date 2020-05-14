@@ -3,14 +3,9 @@ const Keyboard = require("telegraf-keyboard");
 const fetch = require("node-fetch");
 const Markup = require("telegraf/markup");
 const helper = require("./helper");
-const { backHome }= helper;
 
-const startKeyboard = new Keyboard();
 
-startKeyboard
-  .add("Wallet", "Menu")
-  .add("Subscribe Plans", "Order Meals", "Order Addons")
-  .add("My Plans", "My Account", "My Orders");
+const { startKeyboard }= helper;
 
 const accountScene = new WizardScene(
   "AccountScene",
@@ -19,7 +14,7 @@ const accountScene = new WizardScene(
 
     if (!user) {
       ctx.reply(
-        "Sorry you have to register first!",
+        "Sorry! You got to register first!",
         Markup.inlineKeyboard([
           Markup.callbackButton("Register", "REGISTER_NOW"),
         ]).extra()
@@ -52,12 +47,7 @@ const accountScene = new WizardScene(
       ctx.reply("Sorry! unrecognised input. Try again", startKeyboard.draw());
       return ctx.scene.leave();
     }
-    if (ctx.message.text == "Home") {
-      // ctx.reply("Choose an option!", startKeyboard.draw());
-      await backHome(ctx);
-
-      // return ctx.scene.leave();
-    }
+    
     if (ctx.message.text == "Change mobile number") {
       ctx.wizard.state.changeDetail = "mobile";
       ctx.reply("Enter new mobile number", Markup.removeKeyboard().extra());
@@ -110,11 +100,7 @@ const accountScene = new WizardScene(
       }
     }
 
-    if (ctx.message.text == "Home") {
-      ctx.reply("Choose an option!", startKeyboard.draw());
-
-      return ctx.scene.leave();
-    }
+  
 
     const updateUser = {
       query: `
