@@ -95,7 +95,7 @@ bot.use(stage.middleware());
 
 bot.action("REGISTER_NOW", (ctx) => ctx.scene.enter("Register"));
 
-bot.hears("Order Meals", (ctx) => ctx.scene.enter("OrderScene"));
+bot.hears("Onetime order", (ctx) => ctx.scene.enter("OrderScene"));
 
 bot.hears("My Orders", (ctx) => ctx.scene.enter("ViewOrderScene"));
 

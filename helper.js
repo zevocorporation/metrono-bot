@@ -52,7 +52,7 @@ const startKeyboard = new Keyboard();
 
 startKeyboard
   .add("Wallet", "Menu")
-  .add("Subscribe Plans", "Order Meals", "Order Addons")
+  .add("Subscribe Plans", "Onetime order", "Order Addons")
   .add("My Plans", "My Account", "My Orders");
 
 exports.startKeyboard = startKeyboard;
