@@ -50,6 +50,23 @@ bot.start(async (ctx) => {
   }
 });
 
+
+
+// Intialize stage object
+// Stages and scenes are used for dialogue between bot and user
+const stage = new Stage();
+
+//Register imported scene to use them
+stage.register(scene.registerScene);
+stage.register(scene2.orderScene);
+stage.register(scene3.menuScene);
+stage.register(scene4.walletScene);
+stage.register(scene5.accountScene);
+stage.register(scene6.subscriptionScene);
+stage.register(scene7.myplanScene);
+stage.register(scene8.addonScene);
+stage.register(scene9.viewOrderScene);
+
 stage.hears("Home", async (ctx) => {
   user = await helper.verifyUser(ctx);
 
@@ -68,21 +85,6 @@ stage.hears("Home", async (ctx) => {
   }
   return ctx.scene.leave();
 });
-
-// Intialize stage object
-// Stages and scenes are used for dialogue between bot and user
-const stage = new Stage();
-
-//Register imported scene to use them
-stage.register(scene.registerScene);
-stage.register(scene2.orderScene);
-stage.register(scene3.menuScene);
-stage.register(scene4.walletScene);
-stage.register(scene5.accountScene);
-stage.register(scene6.subscriptionScene);
-stage.register(scene7.myplanScene);
-stage.register(scene8.addonScene);
-stage.register(scene9.viewOrderScene);
 
 //Enable session (not currently used)
 bot.use(session());
