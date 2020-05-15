@@ -168,47 +168,22 @@ const orderScene = new WizardScene(
     }
 
     credits = credits * parseInt(ctx.message.text);
+    let orderAmount = credits;
+    let deliveryAmount = 0;
 
-    let addDeliveryCost = false;
-    let date;
-
-    if (ctx.wizard.state.orderFor == "Today") {
-      const today = new Date();
-      date =
-        today.getFullYear() +
-        "-" +
-        (today.getMonth() + 1) +
-        "-" +
-        today.getDate();
-    }
-
-    if (ctx.wizard.state.orderFor == "Tomorrow") {
-      const today = new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
-      date =
-        tomorrow.getFullYear() +
-        "-" +
-        (tomorrow.getMonth() + 1) +
-        "-" +
-        tomorrow.getDate();
-    }
-
-    const requestBody = {
+    let activeUser = false;
+    const checkSubscription = {
       query: `
-              query{
-                  addDeliveryCost(chatId:"${ctx.from.id}",orderType:"${ctx.wizard.state.orderType}",deliveryOn:"${date}")
-                  
-                }
-
-
-              `,
+      
+          query{
+            checkSubscription(chatId:"${ctx.from.id}",mealType:"${ctx.wizard.state.orderType}")
+          }
+      `,
     };
 
     await fetch("https://metrono-backend.herokuapp.com/graphql", {
       method: "POST",
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify(checkSubscription),
       headers: {
         "Content-Type": "application/json",
       },
@@ -220,41 +195,95 @@ const orderScene = new WizardScene(
         return res.json();
       })
       .then((response) => {
-        addDeliveryCost = response.data.addDeliveryCost;
+        activeUser = response.data.checkSubscription;
       })
       .catch((err) => {
         throw err;
       });
 
-    if (!addDeliveryCost) {
-      credits = credits + 10;
-      ctx.reply("You will be charged 10 credits for delivery");
-    } else {
-      ctx.reply(
-        "You won't be charged extra for delivery since you already have an order at that time"
+    if (activeUser) {
+      await ctx.reply(
+        `Since you have an active ${ctx.wizard.state.orderType} plan with delivery facility we offer you a free delivery on this order`
       );
+    } else {
+      let addDeliveryCost = false;
+      let date;
+
+      if (ctx.wizard.state.orderFor == "Today") {
+        const today = new Date();
+        date =
+          today.getFullYear() +
+          "-" +
+          (today.getMonth() + 1) +
+          "-" +
+          today.getDate();
+      }
+
+      if (ctx.wizard.state.orderFor == "Tomorrow") {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        date =
+          tomorrow.getFullYear() +
+          "-" +
+          (tomorrow.getMonth() + 1) +
+          "-" +
+          tomorrow.getDate();
+      }
+
+      const requestBody = {
+        query: `
+                query{
+                    addDeliveryCost(chatId:"${ctx.from.id}",orderType:"${ctx.wizard.state.orderType}",deliveryOn:"${date}")
+                    
+                  }
+  
+  
+                `,
+      };
+
+      await fetch("https://metrono-backend.herokuapp.com/graphql", {
+        method: "POST",
+        body: JSON.stringify(requestBody),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => {
+          if (res.status !== 200 && res.status !== 201) {
+            throw new Error("Failed!");
+          }
+          return res.json();
+        })
+        .then((response) => {
+          addDeliveryCost = response.data.addDeliveryCost;
+        })
+        .catch((err) => {
+          throw err;
+        });
+
+      if (!addDeliveryCost) {
+        credits = credits + 10;
+        deliveryAmount = 10;
+        // ctx.reply("You will be charged 10 credits for delivery");
+      } else {
+        await ctx.reply(
+          `Since you have a ${ctx.wizard.state.orderType} order for ${ctx.wizard.state.orderFor} we offer you a free delivery on this order`
+        );
+      }
     }
 
     ctx.wizard.state.credits = credits;
 
     const keyboard = new Keyboard();
-    await ctx.reply(
-      "You have ordered " +
-        ctx.wizard.state.size +
-        "-" +
-        ctx.message.text +
-        " " +
-        ctx.wizard.state.cuisine +
-        " " +
-        ctx.wizard.state.orderType +
-        " for " +
-        ctx.wizard.state.orderFor
+
+    await ctx.replyWithMarkdown(
+      `*Y O U R  B I L L*\n\nOrder : ${ctx.wizard.state.size}-${ctx.message.text} ${ctx.wizard.state.cuisine} ${ctx.wizard.state.orderType} ${ctx.wizard.state.orderFor}\n\nOrder amount : ${orderAmount} credits \n\nDelivery charge : ${deliveryAmount} credits\n\nTotal credits : ${credits} credits`
     );
 
-    await ctx.reply(`Your order amount is ${credits} credits `);
-
     keyboard.add("Make Payment").add("Home");
-    ctx.reply("Review order and make payment", keyboard.draw());
+    ctx.reply("Complete payment", keyboard.draw());
     return ctx.wizard.next();
   },
 

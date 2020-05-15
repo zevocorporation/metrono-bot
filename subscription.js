@@ -238,9 +238,19 @@ const subscriptionScene = new WizardScene(
         }
       }
 
-      console.log(
-        plan + " " + cuisine + " " + pack + " " + mealType + " " + delivery
-      );
+      const planAmount=amount;
+      let deliveryAmount=0;
+
+      if(delivery=="Home Delivery"  && plan=="7 day plan") 
+      
+      {amount=amount+69;
+        deliveryAmount=69;
+      }
+      if(delivery=="Home Delivery"  && plan=="28 day plan"){amount=amount+279;
+      deliveryAmount=279;} 
+      
+      
+
 
       var headers = {
         "X-Api-Key": "test_6bbdadf8c5089bf688f35b327b6",
@@ -258,7 +268,7 @@ const subscriptionScene = new WizardScene(
         request.post(
           "https://test.instamojo.com/api/1.1/payment-requests/",
           { form: payload, headers: headers },
-          function (error, response, body) {
+          async function (error, response, body) {
             if (!error && response.statusCode == 201) {
               const temp = JSON.parse(body);
               // console.log("this"+temp.payment_request.id)
@@ -266,8 +276,16 @@ const subscriptionScene = new WizardScene(
               console.log(response.statusCode);
               // ctx.reply(temp.payment_request.longurl)
               const keyboard = new Keyboard();
-              keyboard.add("/start");
-              ctx.reply(`Your amount is${amount}`, keyboard.draw());
+              keyboard.add("Home");
+              if(plan=="28 day plan")
+              {
+                await ctx.replyWithMarkdown(`*Y O U R  B I L L* \n\n28 Days ${mealType} Plan - Rs.${planAmount} \n\n28 Days ${mealType} Delivery - Rs.${deliveryAmount} \n\nT O T A L - Rs.${amount} `, keyboard.draw());
+              }
+              if(plan=="7 day plan")
+              {
+                await ctx.replyWithMarkdown(`*Y O U R  B I L L* \n\n7 Days ${mealType} Plan - Rs.${planAmount} \n\n7 Days ${mealType} Delivery - Rs.${deliveryAmount} \n\nT O T A L - Rs.${amount} `, keyboard.draw());
+              }
+              
               ctx.reply(
                 "Complete your payment",
                 Markup.inlineKeyboard([
@@ -277,7 +295,7 @@ const subscriptionScene = new WizardScene(
                   ),
                 ]).extra()
               );
-              ctx;
+              
               console.log(body);
 
               const Subscription = {
@@ -386,7 +404,7 @@ const subscriptionScene = new WizardScene(
                     }
                   }
 
-                  console.log("pending");
+                  // console.log("pending");
                 }
               }
             );

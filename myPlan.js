@@ -1,6 +1,5 @@
 const WizardScene = require("telegraf/scenes/wizard");
 const fetch = require("node-fetch");
-const Keyboard = require("telegraf-keyboard");
 const Markup = require("telegraf/markup");
 
 const helper = require("./helper");
@@ -32,6 +31,7 @@ const myplanScene = new WizardScene("MyPlanScene", async (ctx) => {
                   cuisine
                   createdAt
                   mealType
+                  delivery
                   
                 }
               }
@@ -74,7 +74,8 @@ const myplanScene = new WizardScene("MyPlanScene", async (ctx) => {
     return ctx.scene.leave();
   }
 
-  ctx.reply("Subscribed Plans");
+  await ctx.reply("Subscribed Plans");
+
   for (i = 0; i < subscriptions.length; i++) {
     const today = new Date();
     const plandate = new Date(subscriptions[i].createdAt);
@@ -108,7 +109,8 @@ const myplanScene = new WizardScene("MyPlanScene", async (ctx) => {
           subscriptions[i].mealType +
           " subscription will expire in " +
           validity +
-          " days"
+          " days \n\nDelivery mode: " +
+          subscriptions[i].delivery
       );
     }
   }
