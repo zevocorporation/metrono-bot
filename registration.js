@@ -146,7 +146,7 @@ const  registerScene= new WizardScene(
             }
             else
             {
-                ctx.reply('Already registered!');
+                ctx.reply('Email ID or mobile already used for registration!');
             }
             
         }).catch( 
